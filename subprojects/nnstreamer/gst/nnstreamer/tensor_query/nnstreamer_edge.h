@@ -41,7 +41,7 @@ typedef void *nns_edge_data_h;
 
 /**
  * @brief Enumeration for the error codes of nnstreamer-edge.
- * @todo define detailed error code later (linux standard error, sync with tizen error code)
+ * @todo define detailed error code later (linux standard error code)
  */
 typedef enum {
   NNS_EDGE_ERROR_NONE = 0,
@@ -49,15 +49,11 @@ typedef enum {
   NNS_EDGE_ERROR_OUT_OF_MEMORY = -ENOMEM,
   NNS_EDGE_ERROR_IO = -EIO,
   NNS_EDGE_ERROR_CONNECTION_FAILURE = -ECONNREFUSED,
-  NNS_EDGE_ERROR_UNKNOWN = (-1073741824LL),
-  NNS_EDGE_ERROR_NOT_SUPPORTED = (NNS_EDGE_ERROR_UNKNOWN + 2),
+  NNS_EDGE_ERROR_UNKNOWN = -(INT_MIN / 2),
 } nns_edge_error_e;
 
 typedef enum {
   NNS_EDGE_EVENT_UNKNOWN = 0,
-  NNS_EDGE_EVENT_CAPABILITY,
-  NNS_EDGE_EVENT_NEW_DATA_RECEIVED,
-  NNS_EDGE_EVENT_CALLBACK_RELEASED,
 
   NNS_EDGE_EVENT_CUSTOM = 0x01000000
 } nns_edge_event_e;
@@ -71,10 +67,15 @@ typedef enum {
   NNS_EDGE_PROTOCOL_MAX
 } nns_edge_protocol_e;
 
+typedef enum {
+  NNS_EDGE_DATA_TYPE_INFO = 0,
+  NNS_EDGE_DATA_TYPE_RAW_DATA,
+
+  NNS_EDGE_DATA_TYPE_MAX
+} nns_edge_data_type_e;
+
 /**
  * @brief Callback for the nnstreamer edge event.
- * @note This callback will suspend data stream. Do not spend too much time in the callback.
- * @return User should return NNS_EDGE_ERROR_NONE if an event is successfully handled.
  */
 typedef int (*nns_edge_event_cb) (nns_edge_event_h event_h, void *user_data);
 
@@ -86,12 +87,7 @@ typedef void (*nns_edge_data_destroy_cb) (void *data);
 /**
  * @brief Get registered handle. If not registered, create new handle and register it.
  */
-int nns_edge_create_handle (const char *id, const char *topic, nns_edge_h *edge_h);
-
-/**
- * @brief Start the nnstreamer edge.
- */
-int nns_edge_start (nns_edge_h edge_h, bool is_server);
+int nns_edge_get_handle (const char *id, const char *topic, nns_edge_h *edge_h);
 
 /**
  * @brief Release the given handle.
@@ -124,11 +120,6 @@ int nns_edge_publish (nns_edge_h edge_h, nns_edge_data_h data_h);
 int nns_edge_request (nns_edge_h edge_h, nns_edge_data_h data_h, void *user_data);
 
 /**
- * @brief Respond to a request.
- */
-int nns_edge_respond (nns_edge_h edge_h, nns_edge_data_h data_h);
-
-/**
  * @brief Subscribe a message to a given topic.
  */
 int nns_edge_subscribe (nns_edge_h edge_h, nns_edge_data_h data_h, void *user_data);
@@ -144,31 +135,9 @@ int nns_edge_unsubscribe (nns_edge_h edge_h);
 int nns_edge_get_topic (nns_edge_h edge_h, char **topic);
 
 /**
- * @brief Set nnstreamer edge info.
- */
-int nns_edge_set_info (nns_edge_h edge_h, const char *key, const char *value);
-
-/**
- * @brief Get the nnstreamer edge event type.
- */
-int nns_edge_event_get_type (nns_edge_event_h event_h, nns_edge_event_e *event);
-
-/**
- * @brief Parse edge event (NNS_EDGE_EVENT_NEW_DATA_RECEIVED) and get received data.
- * @note Caller should release returned edge data using nns_edge_data_destroy().
- */
-int nns_edge_event_parse_new_data (nns_edge_event_h event_h, nns_edge_data_h *data_h);
-
-/**
- * @brief Parse edge event (NNS_EDGE_EVENT_CAPABILITY) and get capability string.
- * @note Caller should release returned string using free().
- */
-int nns_edge_event_parse_capability (nns_edge_event_h event_h, char **capability);
-
-/**
  * @brief Create nnstreamer edge data.
  */
-int nns_edge_data_create (nns_edge_data_h *data_h);
+int nns_edge_data_create (nns_edge_data_type_e dtype, nns_edge_data_h *data_h);
 
 /**
  * @brief Destroy nnstreamer edge data.
@@ -176,40 +145,9 @@ int nns_edge_data_create (nns_edge_data_h *data_h);
 int nns_edge_data_destroy (nns_edge_data_h data_h);
 
 /**
- * @brief Validate edge data handle.
- */
-int nns_edge_data_is_valid (nns_edge_data_h data_h);
-
-/**
- * @brief Copy edge data and return new handle.
- */
-int nns_edge_data_copy (nns_edge_data_h data_h, nns_edge_data_h *new_data_h);
-
-/**
  * @brief Add raw data into nnstreamer edge data.
  */
 int nns_edge_data_add (nns_edge_data_h data_h, void *data, size_t data_len, nns_edge_data_destroy_cb destroy_cb);
-
-/**
- * @brief Get the nnstreamer edge data.
- * @note DO NOT release returned data. You should copy the data to another buffer if the returned data is necessary.
- */
-int nns_edge_data_get (nns_edge_data_h data_h, unsigned int index, void **data, size_t *data_len);
-
-/**
- * @brief Get the number of nnstreamer edge data.
- */
-int nns_edge_data_get_count (nns_edge_data_h data_h, unsigned int *count);
-
-/**
- * @brief Set the information of edge data.
- */
-int nns_edge_data_set_info (nns_edge_data_h data_h, const char *key, const char *value);
-
-/**
- * @brief Get the information of edge data. Caller should release the returned value using free().
- */
-int nns_edge_data_get_info (nns_edge_data_h data_h, const char *key, char **value);
 
 #ifdef __cplusplus
 }

@@ -77,6 +77,11 @@
 #include <config.h>
 #endif
 
+
+#ifdef __CYGWIN__
+#include <windows.h>
+#endif
+
 #include <gst/gstinfo.h>
 #include <gst/gst.h>
 #include <glib.h>
@@ -86,6 +91,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <errno.h>
+
 
 #include <nnstreamer_util.h>
 #include "tensor_src_iio.h"
@@ -579,6 +585,8 @@ gst_tensor_src_merge_tensor_by_type (GstTensorInfo * info, guint size,
  * @return >=0 if OK, represents device/trigger number
  *         -1  if returned with error
  */
+
+#ifndef __CYGWIN__
 static gint
 gst_tensor_src_iio_get_id_by_name (const gchar * dir_name, const gchar * name,
     const gchar * prefix)
@@ -635,6 +643,75 @@ error_free_filename:
   closedir (dptr);
   return ret;
 }
+#else //__CYGWIN__ branch
+
+
+static gint
+gst_tensor_src_iio_get_id_by_name (const gchar * dir_name, const gchar * name,
+    const gchar * prefix)
+{
+  HANDLE hFind;
+  WIN32_FIND_DATA FindFileData;
+  GError *error = NULL;
+  gchar *filename = NULL;
+  gint id = -1;
+  gchar *file_contents = NULL;
+  gint ret = -1;
+
+
+  if (!g_file_test (dir_name, G_FILE_TEST_IS_DIR)) {
+    GST_ERROR ("No channels available.");
+    return ret;
+  }
+
+  hFind = FindFirstFile(dir_name, &FindFileData);
+
+  if ( hFind != INVALID_HANDLE_VALUE){ 
+    GST_ERROR ("Error in opening directory %s.\n", dir_name);
+    return ret;
+  }
+
+
+  do {
+    printf("%s\n", FindFileData.cFileName);
+
+    /** check for prefix and the next digit should be a number */
+    if (g_str_has_prefix ( FindFileData.cFileName, prefix) &&
+        g_ascii_isdigit (FindFileData.cFileName[strlen (prefix)])) {
+
+      id = (gint) g_ascii_strtoll ( FindFileData.cFileName + strlen (prefix), NULL,
+          10);
+      filename =
+          g_build_filename (dir_name, FindFileData.cFileName, NAME_FILE, NULL);
+
+      if (!g_file_get_contents (filename, &file_contents, NULL, &error)) {
+        GST_ERROR ("Unable to read %s, error: %s.\n", filename, error->message);
+        g_error_free (error);
+        goto error_free_filename;
+      }
+      g_free (filename);
+
+      if (g_strcmp0 (file_contents, name) == 0) {
+        ret = id;
+        g_free (file_contents);
+        break;
+      }
+      g_free (file_contents);
+    }
+ 
+  }while(FindNextFile(hFind, &FindFileData));
+	  
+  FindClose(hFind);
+  return ret;
+
+error_free_filename:
+  g_free (filename);
+  FindClose(hFind);
+  return ret;
+}
+
+#endif
+
 
 /**
  * @brief check if device/trigger with the given id exists
@@ -863,6 +940,8 @@ gst_tensor_channel_list_filter_enabled (gpointer data, gpointer user_data)
  * @return >=0 number of enabled channels
  *         -1  if any error when scanning channels
  */
+
+#ifndef __CYGWIN__
 static gint
 gst_tensor_src_iio_get_all_channel_info (GstTensorSrcIIO * self,
     const gchar * dir_name)
@@ -1031,6 +1110,182 @@ error_cleanup_list:
   return ret;
 }
 
+#else  //__CYGWIN__ branch
+static gint
+gst_tensor_src_iio_get_all_channel_info (GstTensorSrcIIO * self,
+    const gchar * dir_name)
+{
+  
+  HANDLE hFind;
+  WIN32_FIND_DATA FindFileData;
+
+
+  GError *error = NULL;
+  gchar *filename = NULL;
+  gchar *file_contents = NULL;
+  gint ret = -1;
+  guint value;
+  guint num_channels_enabled = 0;
+  gboolean generic_val, specific_val;
+  gchar *generic_type_filename;
+  GstTensorSrcIIOChannelProperties *channel_prop;
+
+  if (!g_file_test (dir_name, G_FILE_TEST_IS_DIR)) {
+    GST_ERROR_OBJECT (self, "No channels available.");
+    return ret;
+  }
+  
+  hFind = FindFirstFile(dir_name, &FindFileData);
+  
+  if ( hFind != INVALID_HANDLE_VALUE ) {
+    GST_ERROR_OBJECT (self, "Error in opening directory %s.\n", dir_name);
+    return ret;
+  }
+
+  do{
+     /** check for enable */
+    if (g_str_has_suffix ( FindFileData.cFileName, EN_SUFFIX)) {
+      /** not enabling and handling buffer timestamps for now */
+      if (g_str_has_prefix (FindFileData.cFileName, TIMESTAMP)) {
+        continue;
+      }
+
+      channel_prop = g_new0 (GstTensorSrcIIOChannelProperties, 1);
+      if (channel_prop == NULL) {
+        GST_ERROR_OBJECT (self, "Failed to allocate for channel property.");
+        goto error_cleanup_list;
+      }
+
+      self->channels = g_list_prepend (self->channels, channel_prop);
+
+      /** set the name and base_dir */
+      channel_prop->name = g_strndup (FindFileData.cFileName,
+          strlen (FindFileData.cFileName) - strlen (EN_SUFFIX));
+      channel_prop->base_dir = g_strdup (dir_name);
+      channel_prop->base_file =
+          g_build_filename (dir_name, channel_prop->name, NULL);
+      channel_prop->generic_name =
+          gst_tensor_src_iio_get_generic_name (channel_prop->name);
+      silent_debug (self, "Generic name = %s", channel_prop->generic_name);
+
+      /** find and set the current state */
+      filename = g_strdup_printf ("%s%s", channel_prop->base_file, EN_SUFFIX);
+      if (!g_file_get_contents (filename, &file_contents, NULL, &error)) {
+        GST_ERROR_OBJECT (self, "Unable to read %s, error: %s.\n", filename,
+            error->message);
+        goto error_free_filename;
+      }
+      g_free (filename);
+
+      value = (guint) g_ascii_strtoull (file_contents, NULL, 10);
+      g_free (file_contents);
+      if (value == 1) {
+        channel_prop->enabled = TRUE;
+        channel_prop->pre_enabled = TRUE;
+        num_channels_enabled += 1;
+      } else if (value == 0) {
+        channel_prop->enabled = FALSE;
+        channel_prop->pre_enabled = FALSE;
+      } else {
+        GST_ERROR_OBJECT
+            (self,
+            "Enable bit %u (out of range) in current state of channel %s.\n",
+            value, channel_prop->name);
+        goto error_cleanup_list;
+      }
+
+      /** find and set the index */
+      filename =
+          g_strdup_printf ("%s%s", channel_prop->base_file, INDEX_SUFFIX);
+      if (!g_file_get_contents (filename, &file_contents, NULL, &error)) {
+        GST_ERROR_OBJECT (self, "Unable to read %s, error: %s.\n", filename,
+            error->message);
+        goto error_free_filename;
+      }
+      g_free (filename);
+
+      value = (guint) g_ascii_strtoull (file_contents, NULL, 10);
+      g_free (file_contents);
+      channel_prop->index = value;
+
+      /** find and set the type information */
+      filename = g_strdup_printf ("%s%s", channel_prop->base_file, TYPE_SUFFIX);
+      if (!g_file_test (filename, G_FILE_TEST_IS_REGULAR)) {
+        /** if specific type info unavailable, use generic type info */
+        g_free (filename);
+        generic_type_filename =
+            g_strdup_printf ("%s%s", channel_prop->generic_name, TYPE_SUFFIX);
+        filename =
+            g_build_filename (channel_prop->base_dir, generic_type_filename,
+            NULL);
+        g_free (generic_type_filename);
+      }
+      if (!g_file_get_contents (filename, &file_contents, NULL, &error)) {
+        GST_ERROR_OBJECT (self, "Unable to read %s, error: %s.\n", filename,
+            error->message);
+        goto error_free_filename;
+      }
+      g_free (filename);
+
+      if (!gst_tensor_src_iio_set_channel_type (channel_prop, file_contents)) {
+        GST_ERROR_OBJECT (self,
+            "Error while setting up channel type for channel %s.\n",
+            channel_prop->name);
+        g_free (file_contents);
+        goto error_cleanup_list;
+      }
+      g_free (file_contents);
+
+      /** find and setup offset info */
+      channel_prop->scale = 1.0;
+
+      specific_val =
+          gst_tensor_src_iio_get_float_from_file (self->device.base_dir,
+          channel_prop->name, SCALE_SUFFIX, &channel_prop->scale);
+      generic_val =
+          gst_tensor_src_iio_get_float_from_file (self->device.base_dir,
+          channel_prop->generic_name, SCALE_SUFFIX, &channel_prop->scale);
+      if (!specific_val || !generic_val) {
+        goto error_cleanup_list;
+      }
+
+      /** find and setup scale info */
+      channel_prop->offset = 0.0;
+
+      specific_val =
+          gst_tensor_src_iio_get_float_from_file (self->device.base_dir,
+          channel_prop->name, OFFSET_SUFFIX, &channel_prop->offset);
+      generic_val =
+          gst_tensor_src_iio_get_float_from_file (self->device.base_dir,
+          channel_prop->generic_name, OFFSET_SUFFIX, &channel_prop->offset);
+      if (!specific_val || !generic_val) {
+        goto error_cleanup_list;
+      }
+ 
+    }
+  }while(FindNextFile(hFind, &FindFileData));
+
+  /** sort the list with the order of the indices */
+  self->channels =
+      g_list_sort (self->channels, gst_tensor_channel_list_sort_cmp);
+  ret = num_channels_enabled;
+
+  FindClose(hFind);
+  return ret;
+
+error_free_filename:
+  g_error_free (error);
+  g_free (filename);
+
+error_cleanup_list:
+  g_list_free_full (self->channels, gst_tensor_src_iio_channel_properties_free);
+  self->channels = NULL;
+
+ FindClose(hFind);
+  return ret;
+}
+
+#endif //end __CYGWIN__ branch
 /**
  * @brief return sampling frequency given the frequency input from user
  * @param[in] base_dir Device base directory (containing sampling freq file)

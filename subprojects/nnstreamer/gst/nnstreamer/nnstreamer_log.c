@@ -8,7 +8,9 @@
  * @bug		No known bugs except for NYI items
  */
 
-#ifndef __ANDROID__
+
+
+#if !defined(__ANDROID__) && !defined(__CYGWIN__)
 /* Android does not have execinfo.h. It has unwind.h instead. */
 #include <execinfo.h>
 #endif
@@ -29,7 +31,8 @@ char *
 _backtrace_to_string (void)
 {
   char *retstr = NULL;
-#ifndef __ANDROID__
+
+#if !defined(__ANDROID__) && !defined(__CYGWIN__)
 /* Android does not have execinfo.h. It has unwind.h instead. */
   void *array[20];
   char **strings;
@@ -56,7 +59,7 @@ _backtrace_to_string (void)
     free (strings);
   }
 #else
-  retstr = strdup ("Android-nnstreamer does not support backtrace.\n");
+  retstr = strdup ("WIN-nnstreamer does not support backtrace.\n");
 #endif
 
   return retstr;

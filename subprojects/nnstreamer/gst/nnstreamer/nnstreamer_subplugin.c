@@ -332,7 +332,7 @@ subplugin_set_custom_property_desc (subpluginType type, const char *name,
     gchar *desc = va_arg (varargs, gchar *);
 
     if (G_UNLIKELY (desc == NULL)) {
-      ml_logw ("No description for %s", prop);
+      g_critical ("no description for %s", prop);
       return;
     }
 

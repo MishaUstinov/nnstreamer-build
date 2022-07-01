@@ -173,7 +173,7 @@ BuildRequires:	gst-plugins-base
 BuildRequires:	gtest-devel
 # a few test cases uses python
 %if 0%{?check_test}
-BuildRequires:	python3
+BuildRequires:	python
 %endif
 %if 0%{?python3_support}
 # for python3 custom filters
@@ -196,9 +196,6 @@ BuildRequires: tensorflow-lite-devel
 %if 0%{?tensorflow2_lite_support}
 # for tensorflow2-lite
 BuildRequires: tensorflow2-lite-devel
-# tensorflow2-lite-custom requires scripts for rpm >= 4.9
-BuildRequires:  rpm >= 4.9
-%global __requires_exclude ^libtensorflow2-lite-custom.*$
 %endif
 # custom_example_opencv filter requires opencv-devel
 BuildRequires: opencv-devel
@@ -293,7 +290,7 @@ BuildRequires:	snpe-devel
 BuildRequires:	npu-engine-devel
 %endif
 
-# Unit Testing Uses SSAT (https://github.com/myungjoo/SSAT.git)
+# Unit Testing Uses SSAT (hhtps://github.com/myungjoo/SSAT.git)
 %if 0%{?unit_test}
 BuildRequires:	ssat >= 1.1.0
 %endif
@@ -345,7 +342,7 @@ Summary:	NNStreamer TensorFlow Support
 Requires:	nnstreamer = %{version}-%{release}
 Requires:	tensorflow
 %description tensorflow
-NNStreamer's tensor_filter subplugin of TensorFlow.
+NNStreamer's tensor_fliter subplugin of TensorFlow.
 It uses C-API of tensorflow, which is not yet stable as of 1.1x.
 Thus, the user needs to check the version of Tensorflow with the
 Tensorflow used for building this package.
@@ -358,7 +355,7 @@ Summary:	NNStreamer TensorFlow Lite Support
 Requires:	nnstreamer = %{version}-%{release}
 # tensorflow-lite provides .a file and it's embedded into the subplugin. No dep to tflite.
 %description tensorflow-lite
-NNStreamer's tensor_filter subplugin of TensorFlow Lite.
+NNStreamer's tensor_fliter subplugin of TensorFlow Lite.
 %endif
 
 # for tensorflow2-lite
@@ -368,7 +365,7 @@ Summary:	NNStreamer TensorFlow2 Lite Support
 Requires:	nnstreamer = %{version}-%{release}
 # tensorflow2-lite provides .a file and it's embedded into the subplugin. No dep to tflite.
 %description tensorflow2-lite
-NNStreamer's tensor_filter subplugin of TensorFlow2 Lite.
+NNStreamer's tensor_fliter subplugin of TensorFlow2 Lite.
 %endif
 
 %if 0%{?python3_support}
@@ -391,10 +388,10 @@ NNStreamer's tensor_filter subplugin of Arm NN Inference Engine.
 # Support vivante subplugin
 %if 0%{?vivante_support}
 %package vivante
-Summary:    NNStreamer subplugin for Verisilicon's Vivante
+Summary:    NNStreamer subplugin for Verisilion's Vivante
 Requires:   nnstreamer = %{version}-%{release}
 %description vivante
-NNStreamer filter subplugin for Verisilicon Vivante.
+NNStreamer filter subplugin for Verisicon Vivante.
 %define enable_vivante -Denable-vivante=true
 %else
 %define enable_vivante -Denable-vivante=false
@@ -430,7 +427,7 @@ Summary:	NNStreamer PyTorch Support
 Requires:	nnstreamer = %{version}-%{release}
 Requires:	pytorch
 %description pytorch
-NNStreamer's tensor_filter subplugin of pytorch
+NNStreamer's tensor_fliter subplugin of pytorch
 %endif
 
 # for caffe2
@@ -440,7 +437,7 @@ Summary:	NNStreamer caffe2 Support
 Requires:	nnstreamer = %{version}-%{release}
 Requires:	pytorch
 %description caffe2
-NNStreamer's tensor_filter subplugin of caffe2
+NNStreamer's tensor_fliter subplugin of caffe2
 %endif
 
 # for lua
@@ -450,7 +447,7 @@ Summary:	NNStreamer lua Support
 Requires:	nnstreamer = %{version}-%{release}
 Requires:	lua
 %description lua
-NNStreamer's tensor_filter subplugin of lua
+NNStreamer's tensor_fliter subplugin of lua
 %endif
 
 %if 0%{?tvm_support}
@@ -469,7 +466,7 @@ Summary:	NNStreamer snpe Support
 Requires:	nnstreamer = %{version}-%{release}
 Requires:	snpe
 %description snpe
-NNStreamer's tensor_filter subplugin of snpe
+NNStreamer's tensor_fliter subplugin of snpe
 %endif
 
 # for trix-engone
@@ -554,7 +551,7 @@ Summary:	NNStreamer Intel Movidius NCSDK2 support
 Requires:	nnstreamer = %{version}-%{release}
 Group:		Machine Learning/ML Framework
 %description	ncsdk2
-NNStreamer's tensor_filter subplugin of Intel Movidius Neural Compute stick SDK2.
+NNStreamer's tensor_fliter subplugin of Intel Movidius Neural Compute stick SDK2.
 %endif # mvncsdk2_support
 
 %if 0%{openvino_support}
@@ -564,7 +561,7 @@ Requires:	nnstreamer = %{version}-%{release}
 Requires:	openvino
 Group:		Machine Learning/ML Framework
 %description	openvino
-NNStreamer's tensor_filter subplugin for OpenVino support.
+NNStreamer's tensor_fliter subplugin for OpenVino support.
 %endif # openvino_support
 
 # Add Tizen's sensor framework API integration
@@ -704,9 +701,9 @@ Provides additional gstreamer plugins for nnstreamer pipelines
 
 # Support tensorflow2-lite
 %if 0%{?tensorflow2_lite_support}
-%define enable_tf2_lite -Dtflite2-support=enabled -Dtflite2-custom-support=enabled
+%define enable_tf2_lite -Dtflite2-support=enabled
 %else
-%define enable_tf2_lite -Dtflite2-support=disabled -Dtflite2-custom-support=disabled
+%define enable_tf2_lite -Dtflite2-support=disabled
 %endif
 
 # Support pytorch
@@ -819,7 +816,7 @@ mkdir -p build
 
 meson --buildtype=plain --prefix=%{_prefix} --sysconfdir=%{_sysconfdir} --libdir=%{_lib} \
 	--bindir=%{nnstbindir} --includedir=include -Dsubplugindir=%{_prefix}/lib/nnstreamer \
-	%{enable_tizen} %{element_restriction} %{fw_priority} -Denable-env-var=false -Denable-symbolic-link=false \
+	%{enable_tizen} %{element_restriction} %{fw_priority} -Denable-env-var=false -Denable-symbolic-link=true \
 	%{enable_tf_lite} %{enable_tf2_lite} %{enable_tf} %{enable_pytorch} %{enable_caffe2} %{enable_python3} \
 	%{enable_nnfw_runtime} %{enable_mvncsdk2} %{enable_openvino} %{enable_armnn} %{enable_edgetpu}  %{enable_vivante} \
 	%{enable_flatbuf} %{enable_trix_engine} \
@@ -874,7 +871,7 @@ export NNSTREAMER_CONVERTERS=${NNSTREAMER_BUILD_ROOT_PATH}/ext/nnstreamer/tensor
     ssat -n -p=1 --summary summary.txt -cn _n
     popd
 
-python3 tools/development/count_test_cases.py build tests/summary.txt
+python tools/development/count_test_cases.py build tests/summary.txt
 %endif #if unit_test
 
 %install
@@ -983,7 +980,6 @@ cp -r result %{buildroot}%{_datadir}/nnstreamer/unittest/
 %manifest nnstreamer.manifest
 %defattr(-,root,root,-)
 %{_prefix}/lib/nnstreamer/filters/libnnstreamer_filter_tensorflow2-lite.so
-%{_prefix}/lib/nnstreamer/filters/libnnstreamer_filter_tensorflow2-lite-custom.so
 %endif
 
 %if 0%{?python3_support}

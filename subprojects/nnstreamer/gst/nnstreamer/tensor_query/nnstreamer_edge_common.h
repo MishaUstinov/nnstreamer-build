@@ -15,7 +15,6 @@
 #define __NNSTREAMER_EDGE_COMMON_H__
 
 #include <glib.h> /** @todo remove glib */
-#include <pthread.h>
 #include "nnstreamer_edge.h"
 
 #ifdef __cplusplus
@@ -42,11 +41,6 @@ extern "C" {
 #define NNS_EDGE_MAGIC_DEAD 0xdeaddead
 #define NNS_EDGE_MAGIC_IS_VALID(h) ((h) && (h)->magic == NNS_EDGE_MAGIC)
 
-#define nns_edge_lock_init(h) do { pthread_mutex_init (&(h)->lock, NULL); } while (0)
-#define nns_edge_lock_destroy(h) do { pthread_mutex_destroy (&(h)->lock); } while (0)
-#define nns_edge_lock(h) do { pthread_mutex_lock (&(h)->lock); } while (0)
-#define nns_edge_unlock(h) do { pthread_mutex_unlock (&(h)->lock); } while (0)
-
 /**
  * @brief Internal data structure for raw data.
  */
@@ -58,16 +52,18 @@ typedef struct {
 
 /**
  * @brief Internal data structure for edge data.
+ * @todo Implement mutex lock.
  */
 typedef struct {
   unsigned int magic;
+  nns_edge_data_type_e dtype;
   unsigned int num;
   nns_edge_raw_data_s data[NNS_EDGE_DATA_LIMIT];
-  GHashTable *info_table;
 } nns_edge_data_s;
 
 /**
  * @brief Internal data structure for edge event.
+ * @todo Implement mutex lock.
  */
 typedef struct {
   unsigned int magic;
@@ -88,22 +84,39 @@ typedef struct {
 #define nns_edge_logf g_error
 
 /**
+ * @brief Validate edge handle.
+ */
+bool nns_edge_handle_is_valid (nns_edge_h edge_h);
+
+/**
+ * @brief Check network connection.
+ */
+bool nns_edge_is_connected (nns_edge_h edge_h);
+
+/**
+ * @brief Validate data handle.
+ */
+bool nns_edge_data_is_valid (nns_edge_data_h data_h);
+
+/**
  * @brief Create nnstreamer edge event.
- * @note This is internal function for edge event.
  */
 int nns_edge_event_create (nns_edge_event_e event, nns_edge_event_h * event_h);
 
 /**
  * @brief Destroy nnstreamer edge event.
- * @note This is internal function for edge event.
  */
 int nns_edge_event_destroy (nns_edge_event_h event_h);
 
 /**
  * @brief Set event data.
- * @note This is internal function for edge event.
  */
 int nns_edge_event_set_data (nns_edge_event_h event_h, void *data, size_t data_len, nns_edge_data_destroy_cb destroy_cb);
+
+/**
+ * @brief Get the nnstreamer edge event type.
+ */
+int nns_edge_event_get_type (nns_edge_event_h event_h, nns_edge_event_e * event);
 
 #ifdef __cplusplus
 }
