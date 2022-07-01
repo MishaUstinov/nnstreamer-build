@@ -1,0 +1,24 @@
+#!/usr/bin/env python3
+
+##
+# SPDX-License-Identifier: LGPL-2.1-only
+#
+# Copyright (C) 2018 Samsung Electronics
+#
+# @file generateGoldenTestResult.py
+# @brief Generate golden test results for test cases
+# @author Jijoong Moon <jijoong.moon@samsung.com>
+#
+
+from __future__ import print_function
+
+import sys
+import os
+
+sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
+import gen24bBMP as bmp
+
+bmp.gen_BMP_random('RGB', 640, 480, 'testcase01')
+bmp.gen_BMP_random('BGRx', 640, 480, 'testcase01')
+bmp.gen_BMP_random('RGB', 642, 480, 'testcase01')
+bmp.gen_BMP_random('BGRx', 642, 480, 'testcase01')

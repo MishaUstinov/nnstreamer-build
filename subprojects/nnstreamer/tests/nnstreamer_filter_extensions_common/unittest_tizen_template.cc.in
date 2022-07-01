@@ -1,0 +1,668 @@
+/**
+ * @file        unittest_tizen_@EXT_NAME@.cc
+ * @date        19 Dec 2019
+ * @brief       Failure Unit tests for tensor filter extension (@EXT_NAME@).
+ * @see         https://github.com/nnstreamer/nnstreamer
+ * @author      Parichay Kapoor <pk.kapoor@samsung.com>
+ * @bug         No known bugs
+ * @todo        Add support for GstTensorFilterFramework V1
+ */
+
+#include <gtest/gtest.h>
+#include <glib.h>
+#include <glib/gstdio.h>        /* GStatBuf */
+#include <nnstreamer_plugin_api.h>
+#include <nnstreamer_plugin_api_filter.h>
+
+/**
+ * @brief Test @EXT_ABBRV@ subplugin existence.
+ */
+TEST (nnstreamer@EXT_ABBRV@BasicFunctions, checkExistence)
+{
+  const GstTensorFilterFramework *sp = nnstreamer_filter_find ("@EXT_NAME@");
+  EXPECT_NE (sp, (void *) NULL);
+}
+
+/**
+ * @brief Test @EXT_ABBRV@ subplugin with failing open/close (no model file)
+ */
+TEST (nnstreamer@EXT_ABBRV@BasicFunctions, openClose00_n)
+{
+  int ret;
+  const gchar *model_files[] = {
+    "null.@EXT_ABBRV@", NULL,
+  };
+  GstTensorFilterProperties prop = {};
+  prop.fwname = "@EXT_NAME@";
+  prop.fw_opened = 0;
+  prop.model_files = model_files;
+  prop.num_models = 1;
+  void *data = NULL;
+
+  const GstTensorFilterFramework *sp = nnstreamer_filter_find ("@EXT_NAME@");
+  EXPECT_NE (sp, (void *) NULL);
+
+  ret = sp->open (&prop, &data);
+  EXPECT_NE (ret, 0);
+}
+
+/**
+ * @brief Get model file after validation checks
+ * @returns model file path, NULL on error
+ * @note caller has to be free the returned model file path
+ */
+static gchar **
+get_model_files ()
+{
+  gchar *model_file, *model_filepath;
+  gchar *model_path;
+  const gchar *model_filenames = "@MODEL_FILE@";
+  const gchar *root_path = g_getenv ("NNSTREAMER_SOURCE_ROOT_PATH");
+  gchar **model_files, **model_files_iterator;
+  gchar *dirname;
+
+  if (root_path == NULL)
+    root_path = "..";
+
+  model_path = g_build_filename (root_path, "tests", "test_models", "models",
+      NULL);
+
+  model_files = g_strsplit (model_filenames, ",", 0);
+  if (model_files != NULL) {
+    model_files_iterator = model_files;
+    for (model_file = *model_files_iterator; model_file != NULL;
+        model_file = *++model_files_iterator) {
+
+      /** If input is already path, then dont add path */
+      dirname = g_path_get_dirname (model_file);
+      if (g_strcmp0 (dirname, ".") != 0)
+        model_filepath = g_strdup (model_file);
+      else
+        model_filepath = g_build_filename (model_path, model_file, NULL);
+      g_free (dirname);
+
+      if (!g_file_test (model_filepath, G_FILE_TEST_EXISTS)) {
+        g_free (model_filepath);
+        g_free (model_path);
+        g_strfreev (model_files);
+        model_files = NULL;
+        goto ret;
+      }
+
+      g_free (*model_files_iterator);
+      *model_files_iterator = model_filepath;
+    }
+
+    g_message ("%s\n", *model_files);
+  }
+
+  g_free (model_path);
+
+ret:
+  return model_files;
+}
+
+/**
+ * @brief Test @EXT_ABBRV@ subplugin with successful open/close
+ */
+TEST (nnstreamer@EXT_ABBRV@BasicFunctions, openClose01_n)
+{
+  int ret;
+  void *data = NULL;
+  gchar **model_files;
+
+  model_files = get_model_files ();
+  ASSERT_TRUE (model_files != nullptr);
+
+  GstTensorFilterProperties prop = {};
+  prop.fwname = "@EXT_NAME@";
+  prop.fw_opened = 0;
+  prop.model_files = const_cast < const char **>(model_files);
+  prop.num_models = (int) g_strv_length (model_files);
+
+  const GstTensorFilterFramework *sp = nnstreamer_filter_find ("@EXT_NAME@");
+  EXPECT_NE (sp, (void *) NULL);
+
+  /** close without open, should not crash */
+  sp->close (&prop, &data);
+
+  /** open and close successfully */
+  ret = sp->open (&prop, &data);
+  EXPECT_EQ (ret, 0);
+  sp->close (&prop, &data);
+
+  /** close twice, should not crash */
+  sp->close (&prop, &data);
+  g_strfreev (model_files);
+}
+
+/**
+ * @brief Get input/output dimensions with @EXT_ABBRV@ subplugin
+ */
+TEST (nnstreamer@EXT_ABBRV@BasicFunctions, getDimensionFail_n)
+{
+  int ret;
+  void *data = NULL;
+  GstTensorsInfo res;
+  gchar **model_files;
+
+  model_files = get_model_files ();
+  ASSERT_TRUE (model_files != nullptr);
+
+  GstTensorFilterProperties prop = {};
+  prop.fwname = "@EXT_NAME@";
+  prop.fw_opened = 0;
+  prop.model_files = const_cast < const char **>(model_files);
+  prop.num_models = (int) g_strv_length (model_files);
+
+  const GstTensorFilterFramework *sp = nnstreamer_filter_find ("@EXT_NAME@");
+  EXPECT_NE (sp, (void *) NULL);
+
+  if (sp->getInputDimension && sp->getOutputDimension) {
+    /** get input/output dimension without open */
+    ret = sp->getInputDimension (&prop, &data, &res);
+    EXPECT_NE (ret, 0);
+    ret = sp->getOutputDimension (&prop, &data, &res);
+    EXPECT_NE (ret, 0);
+
+    ret = sp->open (&prop, &data);
+    EXPECT_EQ (ret, 0);
+
+    /** get input/output dimension unsuccessfully */
+    ret = sp->getInputDimension (&prop, &data, NULL);
+    EXPECT_NE (ret, 0);
+
+    ret = sp->getOutputDimension (&prop, &data, NULL);
+    EXPECT_NE (ret, 0);
+
+    sp->close (&prop, &data);
+  }
+
+  g_strfreev (model_files);
+}
+
+/**
+ * @brief Get input/output dimensions with @EXT_ABBRV@ subplugin
+ */
+TEST (nnstreamer@EXT_ABBRV@BasicFunctions, getDimension)
+{
+  int ret;
+  void *data = NULL;
+  GstTensorsInfo res;
+  gchar **model_files;
+
+  model_files = get_model_files ();
+  ASSERT_TRUE (model_files != nullptr);
+
+  GstTensorFilterProperties prop = {};
+  prop.fwname = "@EXT_NAME@";
+  prop.fw_opened = 0;
+  prop.model_files = const_cast < const char **>(model_files);
+  prop.num_models = (int) g_strv_length (model_files);
+
+  const GstTensorFilterFramework *sp = nnstreamer_filter_find ("@EXT_NAME@");
+  EXPECT_NE (sp, (void *) NULL);
+
+  ret = sp->open (&prop, &data);
+  EXPECT_EQ (ret, 0);
+
+  /** get input/output dimension successfully */
+  if (sp->getInputDimension && sp->getOutputDimension) {
+    gst_tensors_info_init (&res);
+    ret = sp->getInputDimension (&prop, &data, &res);
+    gst_tensors_info_free (&res);
+    EXPECT_TRUE (ret == 0 || ret == -ENOENT);
+
+    gst_tensors_info_init (&res);
+    ret = sp->getOutputDimension (&prop, &data, &res);
+    gst_tensors_info_free (&res);
+    EXPECT_TRUE (ret == 0 || ret == -ENOENT);
+  }
+
+  sp->close (&prop, &data);
+
+  g_strfreev (model_files);
+}
+
+/**
+ * @brief Set input dimensions with @EXT_ABBRV@ subplugin
+ */
+TEST (nnstreamer@EXT_ABBRV@BasicFunctions, setDimensionFail_n)
+{
+  int ret;
+  void *data = NULL;
+  GstTensorsInfo set;
+  gchar **model_files;
+
+  model_files = get_model_files ();
+  ASSERT_TRUE (model_files != nullptr);
+
+  GstTensorFilterProperties prop = {};
+  prop.fwname = "@EXT_NAME@";
+  prop.fw_opened = 0;
+  prop.model_files = const_cast<const char **>(model_files);
+  prop.num_models = (int) g_strv_length (model_files);
+
+  const GstTensorFilterFramework *sp = nnstreamer_filter_find ("@EXT_NAME@");
+  EXPECT_NE (sp, (void *) NULL);
+
+  if (sp->setInputDimension) {
+    /** set input dimension without open */
+    ret = sp->setInputDimension (&prop, &data, &set, &set);
+    EXPECT_NE (ret, 0);
+
+    ret = sp->open (&prop, &data);
+    EXPECT_EQ (ret, 0);
+
+    gst_tensors_info_init (&set);
+
+    /** set input dimension unsuccessfully */
+    ret = sp->setInputDimension (&prop, &data, NULL, &set);
+    EXPECT_NE (ret, 0);
+    ret = sp->setInputDimension (&prop, &data, &set, NULL);
+    EXPECT_NE (ret, 0);
+
+    gst_tensors_info_free (&set);
+
+    sp->close (&prop, &data);
+  }
+
+  g_strfreev (model_files);
+
+}
+
+/**
+ * @brief Set input dimensions with @EXT_ABBRV@ subplugin
+ */
+TEST (nnstreamer@EXT_ABBRV@BasicFunctions, setDimension)
+{
+  int ret;
+  void *data = NULL;
+  GstTensorsInfo set, get;
+  gchar **model_files;
+
+  model_files = get_model_files ();
+  ASSERT_TRUE (model_files != nullptr);
+
+  GstTensorFilterProperties prop = {};
+  prop.fwname = "@EXT_NAME@";
+  prop.fw_opened = 0;
+  prop.model_files = const_cast<const char **>(model_files);
+  prop.num_models = (int) g_strv_length (model_files);
+
+  const GstTensorFilterFramework *sp = nnstreamer_filter_find ("@EXT_NAME@");
+  EXPECT_NE (sp, (void *) NULL);
+
+  ret = sp->open (&prop, &data);
+  EXPECT_EQ (ret, 0);
+
+  gst_tensors_info_init (&set);
+
+  /** Get the current input dimension, if allowed */
+  ret = -EINVAL;
+  if (sp->getInputDimension) {
+    ret = sp->getInputDimension (&prop, &data, &set);
+    EXPECT_TRUE (ret == 0 || ret == -ENOENT);
+  }
+
+  /** Set the dimension to be set in the framework */
+  if (ret == 0) {
+    /** if get input dimension was success */
+    set.info[0].dimension[0] *= 2;
+    set.info[0].dimension[2] *= 2;
+  } else {
+    set.num_tensors = 1;
+    set.info[0].type = _NNS_INT8;
+    set.info[0].dimension[0] = 10;
+    set.info[0].dimension[1] = 9;
+    set.info[0].dimension[2] = 8;
+    set.info[0].dimension[3] = 7;
+  }
+
+  if (sp->setInputDimension) {
+    /** set input dimension successfully */
+    ret = sp->setInputDimension (&prop, &data, &set, &set);
+    /**
+     * EPERM - changing the input dimension is not permitted for the loaded model
+     * ENOENT - setInputDimension operation is not supported by the framework
+     */
+    if (ret != -EPERM && ret != -ENOENT) {
+      EXPECT_EQ (ret, 0);
+    }
+
+    /** if set was successful and getInputDimension is supported, verify */
+    if (sp->getInputDimension && ret != -EPERM && ret != -ENOENT) {
+      /** use get dimension to verify the set values, if entry exists */
+      gst_tensors_info_init (&get);
+      ret = sp->getInputDimension (&prop, &data, &get);
+      EXPECT_TRUE (ret == 0 || ret == -ENOENT);
+
+      if (ret == 0) {
+        EXPECT_EQ (set.num_tensors, get.num_tensors);
+        EXPECT_EQ (set.info[0].type, get.info[0].type);
+        EXPECT_EQ (set.info[0].dimension[0], get.info[0].dimension[0]);
+        EXPECT_EQ (set.info[0].dimension[1], get.info[0].dimension[1]);
+        EXPECT_EQ (set.info[0].dimension[2], get.info[0].dimension[2]);
+        EXPECT_EQ (set.info[0].dimension[3], get.info[0].dimension[3]);
+      }
+      gst_tensors_info_free (&get);
+    }
+  }
+
+  sp->close (&prop, &data);
+
+  gst_tensors_info_free (&set);
+  g_strfreev (model_files);
+}
+
+/**
+ * @brief Test @EXT_ABBRV@ subplugin with unsuccessful invoke
+ */
+TEST (nnstreamer@EXT_ABBRV@BasicFunctions, invokeFail_n)
+{
+  int ret;
+  void *data = NULL;
+  GstTensorMemory input[NNS_TENSOR_SIZE_LIMIT] = { {}, };
+  GstTensorMemory output[NNS_TENSOR_SIZE_LIMIT] = { {}, };
+  gchar **model_files;
+
+  model_files = get_model_files ();
+  ASSERT_TRUE (model_files != nullptr);
+
+  GstTensorFilterProperties prop = {};
+  prop.fwname = "@EXT_NAME@";
+  prop.fw_opened = 0;
+  prop.model_files = const_cast < const char **>(model_files);
+  prop.num_models = (int) g_strv_length (model_files);
+
+  const GstTensorFilterFramework *sp = nnstreamer_filter_find ("@EXT_NAME@");
+  EXPECT_NE (sp, (void *) NULL);
+
+  /** invoke without open */
+  ret = sp->invoke_NN (&prop, &data, input, output);
+  EXPECT_NE (ret, 0);
+
+  ret = sp->open (&prop, &data);
+  EXPECT_EQ (ret, 0);
+
+  input[0].size = output[0].size = 1 * gst_tensor_get_element_size (_NNS_FLOAT32);
+  input[0].data = g_malloc (input[0].size);
+  output[0].data = g_malloc (output[0].size);
+
+  /** invoke unsuccessful */
+  ret = sp->invoke_NN (&prop, &data, NULL, NULL);
+  EXPECT_NE (ret, 0);
+  ret = sp->invoke_NN (&prop, &data, input, NULL);
+  EXPECT_NE (ret, 0);
+  ret = sp->invoke_NN (&prop, &data, NULL, output);
+  EXPECT_NE (ret, 0);
+
+  g_free (input[0].data);
+  g_free (output[0].data);
+
+  sp->close (&prop, &data);
+  g_strfreev (model_files);
+}
+
+/**
+ * @brief Test @EXT_ABBRV@ subplugin with successful invoke
+ */
+TEST (nnstreamer@EXT_ABBRV@BasicFunctions, invoke)
+{
+  int ret;
+  int ret_get_in, ret_get_out, ret_set_in;
+  void *data = NULL;
+  GstTensorMemory input[NNS_TENSOR_SIZE_LIMIT] = { {}, };
+  GstTensorMemory output[NNS_TENSOR_SIZE_LIMIT] = { {}, };
+  gchar **model_files;
+  GstTensorsInfo input_info, output_info;
+  guint i;
+
+  model_files = get_model_files ();
+  ASSERT_TRUE (model_files != nullptr);
+
+  GstTensorFilterProperties prop = {};
+  prop.fwname = "@EXT_NAME@";
+  prop.fw_opened = 0;
+  prop.model_files = const_cast < const char **>(model_files);
+  prop.num_models = (int) g_strv_length (model_files);
+
+  const GstTensorFilterFramework *sp = nnstreamer_filter_find ("@EXT_NAME@");
+  EXPECT_NE (sp, (void *) NULL);
+
+  EXPECT_TRUE ((sp->getInputDimension && sp->getOutputDimension) ||
+      (sp->setInputDimension));
+
+  ret = sp->open (&prop, &data);
+  EXPECT_EQ (ret, 0);
+
+  /** Decide the size for input and output */
+  gst_tensors_info_init (&input_info);
+  gst_tensors_info_init (&output_info);
+
+  /** if get dimension is supported, try it */
+  ret_get_in = ret_get_out = -EINVAL;
+  if (sp->getInputDimension && sp->getOutputDimension) {
+    ret_get_in = sp->getInputDimension (&prop, &data, &input_info);
+    EXPECT_TRUE (ret_get_in == 0 || ret_get_in == -ENOENT);
+    ret_get_out = sp->getOutputDimension (&prop, &data, &output_info);
+    EXPECT_TRUE (ret_get_out == 0 || ret_get_out == -ENOENT);
+  }
+
+  /** if get dimension was not supported, use set dimension */
+  if (ret_get_in != 0 || ret_get_out != 0 ||
+      !gst_tensors_info_validate (&input_info) ||
+      !gst_tensors_info_validate (&output_info)) {
+    if (sp->setInputDimension) {
+      GstTensorsInfo res;
+
+      gst_tensors_info_init (&res);
+      res.num_tensors = 1;
+      res.info[0].type = _NNS_FLOAT32;
+      res.info[0].dimension[0] = 10;
+      res.info[0].dimension[1] = 1;
+      res.info[0].dimension[2] = 1;
+      res.info[0].dimension[3] = 1;
+
+      /** As get dimension failed, set dimension must pass */
+      ret_set_in = sp->setInputDimension (&prop, &data, &res, &res);
+      EXPECT_EQ (ret_set_in, 0);
+
+      input_info.num_tensors = output_info.num_tensors = 1;
+      input_info.info[0].type = output_info.info[0].type = _NNS_FLOAT32;
+      input_info.info[0].dimension[0] = output_info.info[0].dimension[0] = 10;
+      input_info.info[0].dimension[1] = output_info.info[0].dimension[1] = 1;
+      input_info.info[0].dimension[2] = output_info.info[0].dimension[2] = 1;
+      input_info.info[0].dimension[3] = output_info.info[0].dimension[3] = 1;
+      gst_tensors_info_free (&res);
+    }
+  }
+
+  for (i = 0; i < input_info.num_tensors; ++i) {
+    input[i].size = gst_tensor_info_get_size (&input_info.info[i]);
+    input[i].data = g_malloc (input[i].size);
+  }
+
+  for (i = 0; i < output_info.num_tensors; ++i) {
+    output[i].size = gst_tensor_info_get_size (&output_info.info[i]);
+    output[i].data = g_malloc (output[i].size);
+  }
+
+  /** should never crash */
+  ret = sp->invoke_NN (&prop, &data, input, output);
+  if (input_info.num_tensors != 0 && output_info.num_tensors != 0) {
+    /** should be successful for valid input/output case */
+    EXPECT_EQ (ret, 0);
+  }
+
+  for (i = 0; i < input_info.num_tensors; ++i) {
+    g_free (input[i].data);
+  }
+
+  for (i = 0; i < output_info.num_tensors; ++i) {
+    g_free (output[i].data);
+  }
+
+  gst_tensors_info_free (&input_info);
+  gst_tensors_info_free (&output_info);
+
+  sp->close (&prop, &data);
+  g_strfreev (model_files);
+}
+
+/**
+ * @brief Reload model with @EXT_ABBRV@ subplugin
+ */
+TEST (nnstreamer@EXT_ABBRV@BasicFunctions, reloadModel)
+{
+  int ret;
+  void *data = NULL;
+  gchar **model_files;
+  GstTensorsInfo info;
+  GstTensorMemory input, output;
+
+  model_files = get_model_files ();
+  ASSERT_TRUE (model_files != nullptr);
+
+  GstTensorFilterProperties prop = {};
+  prop.fwname = "@EXT_NAME@";
+  prop.fw_opened = 0;
+  prop.model_files = const_cast<const char **>(model_files);
+  prop.num_models = (int) g_strv_length (model_files);
+
+  const GstTensorFilterFramework *sp = nnstreamer_filter_find ("@EXT_NAME@");
+  EXPECT_NE (sp, (void *) NULL);
+
+  if (sp->reloadModel) {
+    /** reload model without open */
+    ret = sp->reloadModel (&prop, &data);
+    EXPECT_NE (ret, 0);
+
+    ret = sp->open (&prop, &data);
+    EXPECT_EQ (ret, 0);
+
+    /** opening the same model again */
+    ret = sp->reloadModel (&prop, &data);
+    EXPECT_EQ (ret, 0);
+
+    gst_tensors_info_init (&info);
+    ret = sp->getInputDimension (&prop, &data, &info);
+    EXPECT_EQ (ret, 0);
+
+    input.size = gst_tensor_info_get_size (&info.info[0]);
+    gst_tensors_info_free (&info);
+
+    gst_tensors_info_init (&info);
+    ret = sp->getOutputDimension (&prop, &data, &info);
+    EXPECT_EQ (ret, 0);
+
+    output.size = gst_tensor_info_get_size (&info.info[0]);
+    gst_tensors_info_free (&info);
+
+    input.data = g_malloc(input.size);
+    output.data = g_malloc(output.size);
+
+    /** should not crash after reload */
+    ret = sp->invoke_NN (&prop, &data, &input, &output);
+
+    g_free (input.data);
+    g_free (output.data);
+
+    sp->close (&prop, &data);
+  }
+
+  g_strfreev (model_files);
+}
+
+/**
+ * @brief Validate destroy notify with @EXT_ABBRV@ subplugin
+ */
+TEST (nnstreamer@EXT_ABBRV@BasicFunctions, destroyNotify_n)
+{
+  int ret;
+  void *data = NULL;
+  gchar **model_files;
+
+  model_files = get_model_files ();
+  ASSERT_TRUE (model_files != nullptr);
+
+  GstTensorFilterProperties prop = {};
+  prop.fwname = "@EXT_NAME@";
+  prop.fw_opened = 0;
+  prop.model_files = const_cast<const char **>(model_files);
+  prop.num_models = (int) g_strv_length (model_files);
+
+  const GstTensorFilterFramework *sp = nnstreamer_filter_find ("@EXT_NAME@");
+  EXPECT_NE (sp, (void *) NULL);
+
+  if (sp->destroyNotify) {
+    /** must not crash */
+    sp->destroyNotify (&data, NULL);
+
+    ret = sp->open (&prop, &data);
+    EXPECT_EQ (ret, 0);
+
+    /** must not crash */
+    sp->destroyNotify (&data, NULL);
+
+    sp->close (&prop, &data);
+  }
+
+  g_strfreev (model_files);
+}
+
+/**
+ * @brief Check allocate in invoke with @EXT_ABBRV@ subplugin
+ */
+TEST (nnstreamer@EXT_ABBRV@BasicFunctions, allocateInInvoke_n)
+{
+  int ret;
+  void *data = NULL;
+  gchar **model_files;
+
+  model_files = get_model_files ();
+  ASSERT_TRUE (model_files != nullptr);
+
+  GstTensorFilterProperties prop = {};
+  prop.fwname = "@EXT_NAME@";
+  prop.fw_opened = 0;
+  prop.model_files = const_cast<const char **>(model_files);
+  prop.num_models = (int) g_strv_length (model_files);
+
+  const GstTensorFilterFramework *sp = nnstreamer_filter_find ("@EXT_NAME@");
+  EXPECT_NE (sp, (void *) NULL);
+
+  if (sp->allocateInInvoke) {
+    ret = sp->allocateInInvoke (&data);
+    EXPECT_NE (ret, 0);
+
+    ret = sp->open (&prop, &data);
+    EXPECT_EQ (ret, 0);
+
+    /** must not crash */
+    ret = sp->allocateInInvoke (&data);
+
+    sp->close (&prop, &data);
+  }
+
+  g_strfreev (model_files);
+}
+
+/**
+ * @brief Main gtest
+ */
+int
+main (int argc, char **argv)
+{
+  int result = -1;
+
+  try {
+    testing::InitGoogleTest (&argc, argv);
+
+    result = RUN_ALL_TESTS ();
+  } catch (...) {
+    g_warning ("Catched exception, GTest failed.");
+  }
+
+  return result;
+}

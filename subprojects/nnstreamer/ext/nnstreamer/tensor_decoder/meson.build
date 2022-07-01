@@ -1,0 +1,226 @@
+# direct video
+decoder_sub_direct_video_sources = [
+  'tensordec-directvideo.c',
+  'tensordecutil.c'
+]
+
+nnstreamer_decoder_direct_video_sources = []
+foreach s : decoder_sub_direct_video_sources
+  nnstreamer_decoder_direct_video_sources += join_paths(meson.current_source_dir(), s)
+endforeach
+
+shared_library('nnstreamer_decoder_direct_video',
+  nnstreamer_decoder_direct_video_sources,
+  dependencies: [nnstreamer_dep, glib_dep, gst_dep],
+  install: true,
+  install_dir: decoder_subplugin_install_dir
+)
+static_library('nnstreamer_decoder_direct_video',
+  nnstreamer_decoder_direct_video_sources,
+  dependencies: [nnstreamer_dep, glib_dep, gst_dep],
+  install: true,
+  install_dir: nnstreamer_libdir
+)
+
+# image labeling
+decoder_sub_image_labeling_sources = [
+  'tensordec-imagelabel.c',
+  'tensordecutil.c'
+]
+
+nnstreamer_decoder_image_labeling_sources = []
+foreach s : decoder_sub_image_labeling_sources
+  nnstreamer_decoder_image_labeling_sources += join_paths(meson.current_source_dir(), s)
+endforeach
+
+shared_library('nnstreamer_decoder_image_labeling',
+  nnstreamer_decoder_image_labeling_sources,
+  dependencies: [nnstreamer_dep, glib_dep, gst_dep],
+  install: true,
+  install_dir: decoder_subplugin_install_dir
+)
+static_library('nnstreamer_decoder_image_labeling',
+  nnstreamer_decoder_image_labeling_sources,
+  dependencies: [nnstreamer_dep, glib_dep, gst_dep],
+  install: true,
+  install_dir: nnstreamer_libdir
+)
+
+# bounding boxes
+decoder_sub_bounding_boxes_sources = [
+  'tensordec-boundingbox.c',
+  'tensordecutil.c',
+  'tensordec-font.c'
+]
+
+nnstreamer_decoder_bounding_boxes_sources = []
+foreach s : decoder_sub_bounding_boxes_sources
+  nnstreamer_decoder_bounding_boxes_sources += join_paths(meson.current_source_dir(), s)
+endforeach
+
+shared_library('nnstreamer_decoder_bounding_boxes',
+  nnstreamer_decoder_bounding_boxes_sources,
+  dependencies: [nnstreamer_dep, glib_dep, gst_dep, libm_dep],
+  install: true,
+  install_dir: decoder_subplugin_install_dir
+)
+static_library('nnstreamer_decoder_bounding_boxes',
+  nnstreamer_decoder_bounding_boxes_sources,
+  dependencies: [nnstreamer_dep, glib_dep, gst_dep, libm_dep],
+  install: true,
+  install_dir: nnstreamer_libdir
+)
+
+# pose estimation
+decoder_sub_pose_estimation_sources = [
+  'tensordec-pose.c',
+  'tensordecutil.c',
+  'tensordec-font.c'
+]
+
+nnstreamer_decoder_pose_estimation_sources = []
+foreach s : decoder_sub_pose_estimation_sources
+  nnstreamer_decoder_pose_estimation_sources += join_paths(meson.current_source_dir(), s)
+endforeach
+
+shared_library('nnstreamer_decoder_pose_estimation',
+  nnstreamer_decoder_pose_estimation_sources,
+  dependencies: [nnstreamer_dep, glib_dep, gst_dep],
+  install: true,
+  install_dir: decoder_subplugin_install_dir
+)
+static_library('nnstreamer_decoder_pose_estimation',
+  nnstreamer_decoder_pose_estimation_sources,
+  dependencies: [nnstreamer_dep, glib_dep, gst_dep],
+  install: true,
+  install_dir: nnstreamer_libdir
+)
+
+# image segmentation
+decoder_sub_image_segment_sources = [
+  'tensordec-imagesegment.c',
+  'tensordecutil.c'
+]
+
+nnstreamer_decoder_image_segment_sources = []
+foreach s : decoder_sub_image_segment_sources
+  nnstreamer_decoder_image_segment_sources += join_paths(meson.current_source_dir(), s)
+endforeach
+
+shared_library('nnstreamer_decoder_image_segment',
+  nnstreamer_decoder_image_segment_sources,
+  dependencies: [nnstreamer_dep, glib_dep, gst_dep],
+  install: true,
+  install_dir: decoder_subplugin_install_dir
+)
+static_library('nnstreamer_decoder_image_segment',
+  nnstreamer_decoder_image_segment_sources,
+  dependencies: [nnstreamer_dep, glib_dep, gst_dep],
+  install: true,
+  install_dir: nnstreamer_libdir
+)
+
+# protobuf decoder
+if protobuf_support_is_available
+  decoder_sub_protobuf_sources = [
+    'tensordec-protobuf.cc',
+    'tensordecutil.c'
+  ]
+
+  nnstreamer_decoder_protobuf_sources = []
+  foreach s : decoder_sub_protobuf_sources
+    nnstreamer_decoder_protobuf_sources += join_paths(meson.current_source_dir(), s)
+  endforeach
+
+  shared_library('nnstreamer_decoder_protobuf',
+    nnstreamer_decoder_protobuf_sources,
+    dependencies: [nnstreamer_dep, glib_dep, gst_dep, protobuf_util_dep],
+    install: true,
+    install_dir: decoder_subplugin_install_dir
+  )
+endif
+
+# flatbuffer
+if flatbuf_support_is_available
+  decoder_sub_flatbuf_sources = [
+    'tensordec-flatbuf.cc',
+    'tensordecutil.c'
+  ]
+
+  nnstreamer_decoder_flatbuf_sources = [fb_gen_src]
+  foreach s : decoder_sub_flatbuf_sources
+    nnstreamer_decoder_flatbuf_sources += join_paths(meson.current_source_dir(), s)
+  endforeach
+
+  shared_library('nnstreamer_decoder_flatbuf',
+    nnstreamer_decoder_flatbuf_sources,
+    dependencies: [nnstreamer_dep, glib_dep, gst_dep, flatbuf_dep],
+    install: true,
+    install_dir: decoder_subplugin_install_dir,
+  )
+
+  decoder_sub_flexbuf_sources = [
+    'tensordec-flexbuf.cc',
+    'tensordecutil.c'
+  ]
+
+  nnstreamer_decoder_flexbuf_sources = []
+  foreach s : decoder_sub_flexbuf_sources
+    nnstreamer_decoder_flexbuf_sources += join_paths(meson.current_source_dir(), s)
+  endforeach
+
+  shared_library('nnstreamer_decoder_flexbuf',
+    nnstreamer_decoder_flexbuf_sources,
+    dependencies: [nnstreamer_dep, glib_dep, gst_dep, flatbuf_dep],
+    install: true,
+    install_dir: decoder_subplugin_install_dir,
+  )
+endif
+
+# python3
+if have_python3
+  decoder_sub_python3_sources = ['tensordec-python3.cc', 'tensordecutil.c']
+
+  nnstreamer_decoder_python3_sources = []
+  foreach s : decoder_sub_python3_sources
+    nnstreamer_decoder_python3_sources += join_paths(meson.current_source_dir(), s)
+  endforeach
+
+  shared_library('nnstreamer_decoder_python3',
+    nnstreamer_decoder_python3_sources,
+    dependencies: nnstreamer_python3_helper_dep,
+    install: true,
+    install_dir: decoder_subplugin_install_dir
+  )
+
+  static_library('nnstreamer_decoder_python3',
+    nnstreamer_decoder_python3_sources,
+    dependencies: nnstreamer_python3_helper_dep,
+    install: true,
+    install_dir: nnstreamer_libdir
+  )
+endif
+
+# octet stream
+decoder_sub_octet_stream_sources = [
+  'tensordec-octetstream.c',
+  'tensordecutil.c'
+]
+
+nnstreamer_decoder_octet_stream_sources = []
+foreach s : decoder_sub_octet_stream_sources
+  nnstreamer_decoder_octet_stream_sources += join_paths(meson.current_source_dir(), s)
+endforeach
+
+shared_library('nnstreamer_decoder_octet_stream',
+  nnstreamer_decoder_octet_stream_sources,
+  dependencies: [nnstreamer_dep, glib_dep, gst_dep],
+  install: true,
+  install_dir: decoder_subplugin_install_dir
+)
+static_library('nnstreamer_decoder_octet_stream',
+  nnstreamer_decoder_octet_stream_sources,
+  dependencies: [nnstreamer_dep, glib_dep, gst_dep],
+  install: true,
+  install_dir: nnstreamer_libdir
+)

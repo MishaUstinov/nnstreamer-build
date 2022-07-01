@@ -1,0 +1,34 @@
+# Set 1 or True if you want to set your custom sub-plugins' path with env variables.
+# Please be informed that, configured ini file should be in RO partition for the release binary.
+[common]
+enable_envvar=@ENABLE_ENV_VAR@
+enable_symlink=@ENABLE_SYMBOLIC_LINK@
+@EXTRA_CONFIG_PATH@
+
+[filter]
+filters=@SUBPLUGIN_INSTALL_PREFIX@/filters/
+customfilters=@SUBPLUGIN_INSTALL_PREFIX@/customfilters/
+
+# Set framework priority about model file extension when automatically selecting framework for tensor filter.
+# A comma separated prioritized list of neural network frameworks to open model file
+framework_priority_tflite=@FRAMEWORK_PRIORITY_TFLITE@
+framework_priority_nb=@FRAMEWORK_PRIORITY_NB@
+framework_priority_bin=@FRAMEWORK_PRIORITY_BIN@
+
+[decoder]
+decoders=@SUBPLUGIN_INSTALL_PREFIX@/decoders/
+
+[converter]
+converters=@SUBPLUGIN_INSTALL_PREFIX@/converters/
+
+# Set 1 or True if you want to use GPU with pytorch for computation.
+[pytorch]
+enable_use_gpu=@TORCH_USE_GPU@
+
+[tensorflow-lite]
+subplugin_priority=@TFLITE_SUBPLUGIN_PRIORITY@
+
+[filter-aliases]
+trix-engine = @TRIX_ENGINE_ALIAS@
+
+@ELEMENT_RESTRICTION_CONFIG@

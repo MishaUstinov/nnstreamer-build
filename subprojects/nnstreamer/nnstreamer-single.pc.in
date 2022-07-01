@@ -1,0 +1,14 @@
+# Package Information for pkg-config, for nnstreamer sub-plugin and custom plugin writers
+
+prefix=@PREFIX@
+exec_prefix=@EXEC_PREFIX@
+libdir=@LIB_INSTALL_DIR@
+includedir=@INCLUDE_INSTALL_DIR@
+test_templatedir=@TEST_TEMPLATE_DIR@ # test template dir to be used
+
+Name: nnstreamer-single
+Description: Dev Kit of NNStreamer single-shot
+Version: @VERSION@
+Requires:
+Libs: -L${libdir} -lnnstreamer-single
+Cflags: -I${includedir}/nnstreamer
