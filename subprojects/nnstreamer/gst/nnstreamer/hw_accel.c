@@ -24,7 +24,7 @@
 #endif /* __TIZEN__ */
 #endif /* __arch64__ || __arm__ */
 
-#if !defined(__APPLE__)
+#if !defined(__APPLE__) && !defined(__CYGWIN__)
 #include <sys/auxv.h>
 #else
 #define HWCAP_ASIMD 0x1
@@ -33,7 +33,7 @@
 #else
 #define getauxval(x) (0x0)
 #endif /* __aarch64__ */
-#endif /* __APPLE__ */
+#endif /* __APPLE__  || __CYGWIN__*/
 
 /**
  * @brief Check if neon is supported

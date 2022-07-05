@@ -6,7 +6,7 @@ project('nnstreamer', 'c', 'cpp',
   license: ['LGPL-2.1'],
   meson_version: '>=0.50.0',
   default_options: [
-    'werror=true',
+    'werror=false',
     'warning_level=2',
     'c_std=gnu89',
     'cpp_std=c++14'
@@ -283,21 +283,6 @@ if not get_option('mqtt-support').disabled()
   endif
 endif
 
-# deepview-rt
-deepview_rt_dep = dependency('', required: false)
-if not get_option('deepview-rt-support').disabled()
-  deepview_rt_dep = dependency('deepview-rt', required: false)
-  if (not deepview_rt_dep.found())
-    deepview_rt_lib = cxx.find_library('deepview-rt', required: false)
-    if (deepview_rt_lib.found() and cxx.check_header('deepview_rt.h'))
-      deepview_rt_dep = declare_dependency(dependencies: [ deepview_rt_lib ])
-    endif
-  endif
-endif
-if get_option('deepview-rt-support').enabled() and not deepview_rt_dep.found()
-  error('deepview-rt enabled but dependencies are not found.')
-endif
-
 # armnn
 armnn_dep = dependency('', required: false)
 if not get_option('armnn-support').disabled()
@@ -356,10 +341,6 @@ features = {
   'caffe2-support': {
     'target': 'caffe2',
     'project_args': { 'ENABLE_CAFFE2': 1 }
-  },
-  'deepview-rt-support': {
-    'extra_deps': [ deepview_rt_dep ],
-    'project_args': { 'ENABLE_DEEPVIEW_RT': 1 }
   },
   'mvncsdk2-support': {
     'target': 'libmvnc',
@@ -493,6 +474,9 @@ message(project_args)
 foreach name, value: project_args
   add_project_arguments('-D@0@=@1@'.format(name, value), language: ['c', 'cpp'])
 endforeach
+
+add_project_arguments('-DDEBUG', language : ['c','cpp'])
+
 
 # Add redundant declaration flag when caffe2 and pytorch both are disabled
 if not (pytorch_support_is_available or caffe2_support_is_available)
