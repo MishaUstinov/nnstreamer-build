@@ -22,8 +22,7 @@
 #include <nnstreamer_util.h>
 #include "tensordecutil.h"
 
-void init_os (void) __attribute__ ((constructor));
-void fini_os (void) __attribute__ ((destructor));
+REGISTER_FILTER(os);
 
 #define OCTET_CAPS_STR "application/octet-stream"
 

@@ -111,8 +111,7 @@ class ArmNNCore
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */
-void init_filter_armnn (void) __attribute__((constructor));
-void fini_filter_armnn (void) __attribute__((destructor));
+REGISTER_FILTER(filter_armnn);
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */

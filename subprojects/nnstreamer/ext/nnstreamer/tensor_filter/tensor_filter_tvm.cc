@@ -32,8 +32,7 @@ namespace tensorfilter_tvm
 
 G_BEGIN_DECLS
 
-void init_filter_tvm (void) __attribute__ ((constructor));
-void fini_filter_tvm (void) __attribute__ ((destructor));
+REGISTER_FILTER(filter_tvm);
 
 G_END_DECLS
 

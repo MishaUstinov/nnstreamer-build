@@ -57,9 +57,8 @@ extern "C" {
 #if defined(__ANDROID__)
 void init_filter_snpe (JNIEnv *env, jobject context);
 #else
-void init_filter_snpe (void) __attribute__((constructor));
+REGISTER_FILTER(filter_snpe);
 #endif
-void fini_filter_snpe (void) __attribute__((destructor));
 }
 
 /** @brief tensor-filter-subplugin concrete class for SNPE */

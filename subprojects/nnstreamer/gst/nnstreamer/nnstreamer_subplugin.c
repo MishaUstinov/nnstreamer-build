@@ -34,8 +34,7 @@
 /** @brief Array of dynamic loaded handles */
 static GPtrArray *handles = NULL;
 
-static void init_subplugin (void) __attribute__((constructor));
-static void fini_subplugin (void) __attribute__((destructor));
+REGISTER_FILTER(subplugin);
 
 typedef struct
 {

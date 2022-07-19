@@ -43,6 +43,23 @@ G_BEGIN_DECLS
 #define NNSTREAMER_SYS_ROOT_PATH_PREFIX "/"
 #endif /* G_OS_WIN32 */
 
+/* Filter init/clear functions registration */
+#ifdef G_OS_WIN32
+#pragma section(".CRT$XCT", read)
+#define REGISTER_FILTER(filter) \
+    void init_##filter(void); \
+    void fini_##filter(void); \
+    void filter##registrator(void) { \
+        init_##filter(); \
+        atexit(fini_##filter); \
+    } \
+    __declspec(allocate(".CRT$XCT")) void(*filter##_registrator)(void) = filter##registrator;
+#else
+#define REGISTER_FILTER(filter) \
+    void init_##filter (void) __attribute__((constructor)); \
+    void fini_##filter (void) __attribute__((destructor));
+#endif /* G_OS_WIN32 */
+
 /**
  * Hard-coded system-dependent file extension string of shared
  * (dynamic loadable) object
@@ -168,8 +185,8 @@ nnsconf_get_custom_value_bool (const gchar * group, const gchar * key, gboolean 
  * @param[out] str Preallocated string for the output (dump).
  * @param[in] size The size of given str.
  */
-extern void
-nnsconf_dump (gchar * str, gulong size);
+//extern void
+//nnsconf_dump (gchar * str, gulong size);
 
 extern void
 nnsconf_subplugin_dump (gchar * str, gulong size);

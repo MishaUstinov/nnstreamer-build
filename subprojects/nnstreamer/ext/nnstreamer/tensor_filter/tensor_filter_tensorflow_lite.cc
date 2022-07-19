@@ -272,8 +272,7 @@ class TFLiteCore
 };
 
 extern "C" {
-void init_filter_tflite (void) __attribute__ ((constructor));
-void fini_filter_tflite (void) __attribute__ ((destructor));
+REGISTER_FILTER(filter_tflite);
 }
 
 G_LOCK_DEFINE_STATIC (slock);

@@ -44,8 +44,7 @@ namespace flatbuf
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */
-void init_fbc (void) __attribute__((constructor));
-void fini_fbc (void) __attribute__((destructor));
+REGISTER_FILTER(fbc);
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */

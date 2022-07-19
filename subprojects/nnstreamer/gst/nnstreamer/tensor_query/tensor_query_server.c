@@ -29,8 +29,7 @@ G_LOCK_DEFINE_STATIC (query_server_table);
  */
 static GHashTable *_qs_table = NULL;
 
-static void init_queryserver (void) __attribute__((constructor));
-static void fini_queryserver (void) __attribute__((destructor));
+REGISTER_FILTER(queryserver);
 
 /**
  * @brief Getter to get nth GstTensorQueryServerInfo.
