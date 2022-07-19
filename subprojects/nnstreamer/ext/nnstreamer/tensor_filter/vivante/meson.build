@@ -33,7 +33,7 @@ vflag = '-ldl'
 subplugin_shared = shared_library('nnstreamer_filter_vivante',
   sources,
   include_directories: vivante_todo_incs,
-  dependencies: [base_deps, libovx_dep, libdl_dep],
+  dependencies: [base_deps, libovx_dep],
   link_args : vflag,
   install: true,
   install_dir: filter_subplugin_install_dir
