@@ -572,7 +572,7 @@ nnsconf_get_custom_value_string (const gchar * group, const gchar * key)
 
     /* 2. Read ini */
     if (NULL == value && conf.conffile) {
-      g_autoptr (GKeyFile) key_file = g_key_file_new ();
+      GKeyFile* key_file = g_key_file_new ();
 
       g_assert (key_file != NULL); /** Internal lib error? out-of-memory? */
 
@@ -580,6 +580,7 @@ nnsconf_get_custom_value_string (const gchar * group, const gchar * key)
               NULL)) {
         value = g_key_file_get_string (key_file, group, key, NULL);
       }
+      g_key_file_free(key_file);
     }
 
     if (value) {
