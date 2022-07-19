@@ -105,8 +105,7 @@
     pdata->name (__VA_ARGS__) : \
     err)
 
-void init_filter_vivante (void) __attribute__ ((constructor));
-void fini_filter_vivante (void) __attribute__ ((destructor));
+REGISTER_FILTER(filter_vivante);
 
 /**
  * @brief If you need to store session or model data,
