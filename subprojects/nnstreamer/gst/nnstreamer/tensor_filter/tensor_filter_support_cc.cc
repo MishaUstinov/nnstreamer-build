@@ -250,17 +250,18 @@ tensor_filter_subplugin::cpp_eventHandler (const GstTensorFilterFramework *tf,
 /**
  * @brief The template for fwdesc, the C wrapper (V1) struct.
  */
-const GstTensorFilterFramework tensor_filter_subplugin::fwdesc_template
-    = {.version = GST_TENSOR_FILTER_FRAMEWORK_V1,
-        .open = cpp_open,
-        .close = cpp_close,
-        {.v1 = {
-             .invoke = cpp_invoke,
-             .getFrameworkInfo = cpp_getFrameworkInfo,
-             .getModelInfo = cpp_getModelInfo,
-             .eventHandler = cpp_eventHandler,
-             .subplugin_data = nullptr,
-         } } };
+const GstTensorFilterFramework tensor_filter_subplugin::fwdesc_template = { 
+    GST_TENSOR_FILTER_FRAMEWORK_V1,
+    cpp_open,
+    cpp_close,
+    //{
+    //    cpp_invoke,
+    //    cpp_getFrameworkInfo,
+    //    cpp_getModelInfo,
+    //    cpp_eventHandler,
+    //    nullptr,
+    //} 
+};
 
 /**
  * @brief Base constructor. The object represents a non-functional empty anchor

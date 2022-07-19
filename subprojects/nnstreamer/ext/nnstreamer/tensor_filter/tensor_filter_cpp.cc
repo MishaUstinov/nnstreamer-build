@@ -39,6 +39,7 @@
 #include <nnstreamer_plugin_api_filter.h>
 #undef NO_ANONYMOUS_NESTED_STRUCT
 #include <nnstreamer_util.h>
+#include <nnstreamer_conf.h>
 
 #include "tensor_filter_cpp.hh"
 
@@ -49,30 +50,33 @@ G_LOCK_DEFINE_STATIC (lock_handles);
 static gchar filter_subplugin_cpp[] = "cpp";
 bool tensor_filter_cpp::close_all_called = false;
 
-static GstTensorFilterFramework NNS_support_cpp = {.version = GST_TENSOR_FILTER_FRAMEWORK_V0,
-  .open = tensor_filter_cpp::open,
-  .close = tensor_filter_cpp::close,
-  {.v0 = {
-       .name = filter_subplugin_cpp,
-       .allow_in_place = FALSE, /** @todo: support this to optimize performance later. */
-       .allocate_in_invoke = FALSE,
-       .run_without_model = FALSE,
-       .verify_model_path = FALSE,
-       .statistics = nullptr,
-       .invoke_NN = tensor_filter_cpp::invoke,
-       .getInputDimension = tensor_filter_cpp::getInputDim,
-       .getOutputDimension = tensor_filter_cpp::getOutputDim,
-       .setInputDimension = tensor_filter_cpp::setInputDim,
-       .destroyNotify = nullptr,
-       .reloadModel = nullptr,
-       .handleEvent = nullptr,
-       .checkAvailability = nullptr,
-       .allocateInInvoke = nullptr,
-   } } };
+static GstTensorFilterFramework NNS_support_cpp = { 
+  GST_TENSOR_FILTER_FRAMEWORK_V0,
+  tensor_filter_cpp::open,
+  tensor_filter_cpp::close,
+  {
+       filter_subplugin_cpp,
+       FALSE, /** @todo: support this to optimize performance later. */
+       FALSE,
+       FALSE,
+       FALSE,
+       nullptr,
+       tensor_filter_cpp::invoke,
+       tensor_filter_cpp::getInputDim,
+       tensor_filter_cpp::getOutputDim,
+       tensor_filter_cpp::setInputDim,
+       nullptr,
+       nullptr,
+       nullptr,
+       nullptr,
+       nullptr,
+   } 
+};
 
 G_BEGIN_DECLS
-void init_filter_cpp (void) __attribute__((constructor));
-void fini_filter_cpp (void) __attribute__((destructor));
+void init_filter_cpp (void);
+void fini_filter_cpp (void);
+REGISTER_FILTER(filter_cpp);
 
 /** @brief Initialize this object for tensor_filter subplugin runtime register */
 void
@@ -207,8 +211,7 @@ tensor_filter_cpp::invoke (const GstTensorFilterProperties *prop,
 /**
  * @brief Printout only once for a given error
  */
-__attribute__((format (printf, 3, 4))) static void
-g_printerr_once (const char *file, int line, const char *fmt, ...)
+static void g_printerr_once (const char *file, int line, const char *fmt, ...)
 {
   static guint file_hash = 0;
   static int _line = 0;
@@ -247,17 +250,12 @@ tensor_filter_cpp::open (const GstTensorFilterProperties *prop, void **private_d
 
     GModule *module = g_module_open (prop->model_files[1], (GModuleFlags)0);
     if (!module) {
-      g_printerr_once (__FILE__, __LINE__,
-          "C++ custom filter %s cannot be found: opening %s failed\n",
-          prop->model_files[0], prop->model_files[1]);
       return -EINVAL; /** Model file / name not found */
     }
 
     if (filters.find (prop->model_files[0]) == filters.end ()) {
       /** It's still not found. it's not there. */
       g_module_close (module);
-      g_printerr_once (__FILE__, __LINE__, "C++ custom filter %s is not found in %s.\n",
-          prop->model_files[0], prop->model_files[1]);
       return -EINVAL;
     }
 

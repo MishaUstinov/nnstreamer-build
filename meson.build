@@ -1,7 +1,9 @@
 project('All GStreamer modules', 'c',
   version : '1.19.2',
   meson_version : '>= 0.54.0',
-  default_options : ['buildtype=debugoptimized'])
+  default_options : [
+      'buildtype=debugoptimized', 'cpp_std=c++20', 'std=c++20', 'c_std=c11',
+  ])
 
 gst_version = '>= @0@'.format(meson.project_version())
 gst_branch = 'master'
@@ -102,6 +104,7 @@ subprojects = [
   ['gst-python', { 'option': get_option('python')}],
   ['gst-examples', { 'option': get_option('gst-examples'), 'match_gst_versions': false}],
   ['gst-plugins-rs', { 'option': get_option('rs'), 'match_gst_version': false}],
+  ['nnstreamer', {'option': get_option('nnstreamer'), 'build-hotdoc': false}],
 ]
 
 symlink = '''

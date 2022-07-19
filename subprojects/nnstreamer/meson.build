@@ -8,8 +8,9 @@ project('nnstreamer', 'c', 'cpp',
   default_options: [
     'werror=false',
     'warning_level=2',
-    'c_std=gnu89',
-    'cpp_std=c++14'
+    'std=c++20',
+    'c_std=c20',
+    'cpp_std=c++20'
   ]
 )
 
@@ -145,9 +146,9 @@ gst_audio_dep = dependency('gstreamer-audio-' + gst_api_verision)
 gst_app_dep = dependency('gstreamer-app-' + gst_api_verision)
 gst_check_dep = dependency('gstreamer-check-' + gst_api_verision)
 
-libm_dep = cc.find_library('m') # cmath library
-libdl_dep = cc.find_library('dl') # DL library
-thread_dep = dependency('threads') # pthread for tensorflow-lite
+#libm_dep = cc.find_library('m') # cmath library
+#libdl_dep = cc.find_library('dl') # DL library
+#thread_dep = dependency('threads') # pthread for tensorflow-lite
 
 # Protobuf
 protobuf_dep = dependency('protobuf', version: '>= 3.6.1', required: false)

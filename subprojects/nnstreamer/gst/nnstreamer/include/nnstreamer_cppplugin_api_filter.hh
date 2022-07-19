@@ -41,11 +41,7 @@
 #include <assert.h>
 #include <string.h>
 #include <nnstreamer_plugin_api_filter.h>
-#if __cplusplus < 201103L
-#warn C++11 is required for safe execution
-#else
 #include <type_traits>
-#endif
 
 
 namespace nnstreamer {
@@ -93,13 +89,9 @@ class tensor_filter_subplugin {
  */
     template<typename T>
     static T * register_subplugin () {
-#if __cplusplus < 201103L
-#warn C++11 is required for safe execution
-#else
-      /** The given class T should be derived from tensor_filter_subplugin */
-      assert ((std::is_base_of<tensor_filter_subplugin, T>::value));
-#endif
-      T *emptyInstance = new T();
+        /** The given class T should be derived from tensor_filter_subplugin */
+        assert ((std::is_base_of<tensor_filter_subplugin, T>::value));
+        T *emptyInstance = new T();
 
       assert (emptyInstance);
       memcpy (&emptyInstance->fwdesc, &fwdesc_template,
@@ -124,12 +116,8 @@ class tensor_filter_subplugin {
     template<typename T>
     static void unregister_subplugin (T * emptyInstance) {
       GstTensorFilterFrameworkInfo info;
-#if __cplusplus < 201103L
-#warn C++11 is required for safe execution
-#else
       /** The given class T should be derived from tensor_filter_subplugin */
       assert ((std::is_base_of<tensor_filter_subplugin, T>::value));
-#endif
       assert (emptyInstance);
 
       emptyInstance->getFrameworkInfo (info);
