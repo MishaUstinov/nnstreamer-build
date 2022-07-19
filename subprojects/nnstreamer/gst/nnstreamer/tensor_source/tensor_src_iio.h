@@ -31,7 +31,9 @@
 #include <gst/base/gstbasesrc.h>
 #include <glib/gprintf.h>
 #include <tensor_common.h>
+#ifndef G_OS_WIN32
 #include <poll.h>
+#endif
 
 G_BEGIN_DECLS
 #define GST_TYPE_TENSOR_SRC_IIO \

@@ -77,9 +77,24 @@
 #include <config.h>
 #endif
 
+#include <glib.h>
 
-#ifdef __CYGWIN__
+#ifdef G_OS_WIN32
 #include <windows.h>
+#define UNBLOCK_FLAG FIONBIO
+struct pollfd {
+    SOCKET fd;
+    short events;
+    short revents;
+};
+
+#define POLLIN 0x001
+
+#else
+define UNBLOCK_FLAG O_NONBLOCK
+
+#include <endian.h>
+#include <unistd.h>
 #endif
 
 #include <gst/gstinfo.h>
@@ -87,9 +102,7 @@
 #include <glib.h>
 #include <glib/gstdio.h>
 #include <string.h>
-#include <endian.h>
 #include <fcntl.h>
-#include <unistd.h>
 #include <errno.h>
 
 
@@ -586,7 +599,7 @@ gst_tensor_src_merge_tensor_by_type (GstTensorInfo * info, guint size,
  *         -1  if returned with error
  */
 
-#ifndef __CYGWIN__
+#ifndef G_OS_WIN32
 static gint
 gst_tensor_src_iio_get_id_by_name (const gchar * dir_name, const gchar * name,
     const gchar * prefix)
@@ -643,7 +656,7 @@ error_free_filename:
   closedir (dptr);
   return ret;
 }
-#else //__CYGWIN__ branch
+#else //G_OS_WIN32 branch
 
 
 static gint
@@ -941,7 +954,7 @@ gst_tensor_channel_list_filter_enabled (gpointer data, gpointer user_data)
  *         -1  if any error when scanning channels
  */
 
-#ifndef __CYGWIN__
+#ifndef G_OS_WIN32
 static gint
 gst_tensor_src_iio_get_all_channel_info (GstTensorSrcIIO * self,
     const gchar * dir_name)
@@ -1110,7 +1123,7 @@ error_cleanup_list:
   return ret;
 }
 
-#else  //__CYGWIN__ branch
+#else  //G_OS_WIN32 branch
 static gint
 gst_tensor_src_iio_get_all_channel_info (GstTensorSrcIIO * self,
     const gchar * dir_name)
@@ -1285,7 +1298,7 @@ error_cleanup_list:
   return ret;
 }
 
-#endif //end __CYGWIN__ branch
+#endif //end G_OS_WIN32 branch
 /**
  * @brief return sampling frequency given the frequency input from user
  * @param[in] base_dir Device base directory (containing sampling freq file)
@@ -2215,7 +2228,7 @@ gst_tensor_src_iio_setup_device_buffer (GstTensorSrcIIO * self)
   }
 
   self->buffer_data_fp->events = POLLIN;
-  self->buffer_data_fp->fd = open (filename, O_RDONLY | O_NONBLOCK);
+  self->buffer_data_fp->fd = open (filename, O_RDONLY | UNBLOCK_FLAG);
   if (self->buffer_data_fp->fd < 0) {
     GST_ERROR_OBJECT (self, "Failed to open buffer %s for device %s.\n",
         filename, self->device.name);
