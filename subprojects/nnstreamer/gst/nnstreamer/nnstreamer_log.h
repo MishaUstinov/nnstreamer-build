@@ -88,6 +88,7 @@ extern "C" {
  * @brief stack trace as a string for error messages
  * @return a string of stacktrace result. caller should free it.
  */
+__declspec(dllexport)
 extern char *
 _backtrace_to_string (void);
 
@@ -122,18 +123,21 @@ _backtrace_to_string (void);
  * @brief return the last internal error string and clean it.
  * @return a string of error. Do not free the returned string.
  */
+__declspec(dllexport)
 extern const char *
 _nnstreamer_error (void);
 
 /**
  * @brief overwrites the error message buffer with the new message.
  */
+__declspec(dllexport)
 extern void
 _nnstreamer_error_write (const char *fmt, ...);
 
 /**
  * @brief cleans up the error message buffer.
  */
+__declspec(dllexport)
 extern void
 _nnstreamer_error_clean (void);
 

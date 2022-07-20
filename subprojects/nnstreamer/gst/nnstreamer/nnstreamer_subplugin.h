@@ -57,6 +57,7 @@ typedef enum {
  * @param[in] name Subplugin Name. The filename should be libnnstreamer_${type}_${name}.so
  * @return The registered data
  */
+__declspec(dllexport)
 extern const void *
 get_subplugin (subpluginType type, const char *name);
 
@@ -66,6 +67,7 @@ get_subplugin (subpluginType type, const char *name);
  * @return The list of subplugin name
  * @note Caller should free the returned value using g_strfreev()
  */
+__declspec(dllexport)
 extern gchar **
 get_all_subplugins (subpluginType type);
 
@@ -76,6 +78,7 @@ get_all_subplugins (subpluginType type);
  * @param[in] data The registered data
  * @return TRUE if registered as new. FALSE if duplicated (overwritten/updated).
  */
+__declspec(dllexport)
 extern gboolean
 register_subplugin (subpluginType type, const char *name, const void *data);
 
@@ -87,13 +90,16 @@ register_subplugin (subpluginType type, const char *name, const void *data);
  *
  * @warning Subplugins checked out with get_subplugins can still be used after unregister.
  */
+__declspec(dllexport)
 extern gboolean
 unregister_subplugin (subpluginType type, const char *name);
 
+__declspec(dllexport)
 extern void
 subplugin_set_custom_property_desc (subpluginType type, const char *name,
     const gchar * prop, va_list varargs);
 
+__declspec(dllexport)
 extern GData *
 subplugin_get_custom_property_desc (subpluginType type, const char *name);
 

@@ -30,6 +30,7 @@ G_BEGIN_DECLS
  * @brief Initialize the tensor info structure
  * @param info tensor info structure to be initialized
  */
+__declspec(dllexport)
 extern void
 gst_tensor_info_init (GstTensorInfo * info);
 
@@ -37,6 +38,7 @@ gst_tensor_info_init (GstTensorInfo * info);
  * @brief Free allocated data in tensor info structure
  * @param info tensor info structure
  */
+__declspec(dllexport)
 extern void
 gst_tensor_info_free (GstTensorInfo * info);
 
@@ -45,6 +47,7 @@ gst_tensor_info_free (GstTensorInfo * info);
  * @param info tensor info structure
  * @return data size
  */
+__declspec(dllexport)
 extern gsize
 gst_tensor_info_get_size (const GstTensorInfo *info);
 
@@ -53,6 +56,7 @@ gst_tensor_info_get_size (const GstTensorInfo *info);
  * @param info tensor info structure
  * @return TRUE if info is valid
  */
+__declspec(dllexport)
 extern gboolean
 gst_tensor_info_validate (const GstTensorInfo *info);
 
@@ -60,6 +64,7 @@ gst_tensor_info_validate (const GstTensorInfo *info);
  * @brief Compare tensor info
  * @return TRUE if equal, FALSE if given tensor infos are invalid or not equal.
  */
+__declspec(dllexport)
 extern gboolean
 gst_tensor_info_is_equal (const GstTensorInfo * i1, const GstTensorInfo * i2);
 
@@ -67,6 +72,7 @@ gst_tensor_info_is_equal (const GstTensorInfo * i1, const GstTensorInfo * i2);
  * @brief Copy tensor info up to n elements
  * @note Copied info should be freed with gst_tensor_info_free()
  */
+__declspec(dllexport)
 extern void
 gst_tensor_info_copy_n (GstTensorInfo * dest, const GstTensorInfo * src,
     const guint n);
@@ -75,6 +81,7 @@ gst_tensor_info_copy_n (GstTensorInfo * dest, const GstTensorInfo * src,
  * @brief Copy tensor info
  * @note Copied info should be freed with gst_tensor_info_free()
  */
+__declspec(dllexport)
 extern void
 gst_tensor_info_copy (GstTensorInfo * dest, const GstTensorInfo * src);
 
@@ -84,6 +91,7 @@ gst_tensor_info_copy (GstTensorInfo * dest, const GstTensorInfo * src);
  * @param[out] meta tensor meta structure to be filled
  * @return TRUE if successfully set the meta
  */
+__declspec(dllexport)
 extern gboolean
 gst_tensor_info_convert_to_meta (GstTensorInfo * info, GstTensorMetaInfo * meta);
 
@@ -92,6 +100,7 @@ gst_tensor_info_convert_to_meta (GstTensorInfo * info, GstTensorMetaInfo * meta)
  * @param info tensor info structure
  * @return tensor rank (Minimum rank is 1 if given info is valid)
  */
+__declspec(dllexport)
 extern gint
 gst_tensor_info_get_rank (const GstTensorInfo * info);
 
@@ -99,6 +108,7 @@ gst_tensor_info_get_rank (const GstTensorInfo * info);
  * @brief Initialize the tensors info structure
  * @param info tensors info structure to be initialized
  */
+__declspec(dllexport)
 extern void
 gst_tensors_info_init (GstTensorsInfo *info);
 
@@ -106,6 +116,7 @@ gst_tensors_info_init (GstTensorsInfo *info);
  * @brief Free allocated data in tensors info structure
  * @param info tensors info structure
  */
+__declspec(dllexport)
 extern void
 gst_tensors_info_free (GstTensorsInfo * info);
 
@@ -115,7 +126,8 @@ gst_tensors_info_free (GstTensorsInfo * info);
  * @param index the index of tensor (-1 to get total size of tensors)
  * @return data size
  */
-gsize
+__declspec(dllexport)
+extern gsize
 gst_tensors_info_get_size (const GstTensorsInfo * info, gint index);
 
 /**
@@ -124,6 +136,7 @@ gst_tensors_info_get_size (const GstTensorsInfo * info, gint index);
  * @param dim_string string of dimensions
  * @return number of parsed dimensions
  */
+__declspec(dllexport)
 extern guint
 gst_tensors_info_parse_dimensions_string (GstTensorsInfo *info,
     const gchar *dim_string);
@@ -134,6 +147,7 @@ gst_tensors_info_parse_dimensions_string (GstTensorsInfo *info,
  * @param type_string string of types
  * @return number of parsed types
  */
+__declspec(dllexport)
 extern guint
 gst_tensors_info_parse_types_string (GstTensorsInfo * info,
     const gchar * type_string);
@@ -144,6 +158,7 @@ gst_tensors_info_parse_types_string (GstTensorsInfo * info,
  * @param name_string string of names
  * @return number of parsed names
  */
+__declspec(dllexport)
 extern guint
 gst_tensors_info_parse_names_string (GstTensorsInfo * info,
     const gchar * name_string);
@@ -154,15 +169,18 @@ gst_tensors_info_parse_names_string (GstTensorsInfo * info,
  * @return string of dimensions in tensors info (NULL if the number of tensors is 0)
  * @note The returned value should be freed with g_free()
  */
+__declspec(dllexport)
 extern gchar *
 gst_tensors_info_get_dimensions_string (const GstTensorsInfo * info);
 
 /**
  * @brief Get the string of types in tensors info
- * @param info tensors info structure
+ * @param info tensor
+s info structure
  * @return string of types in tensors info (NULL if the number of tensors is 0)
  * @note The returned value should be freed with g_free()
  */
+__declspec(dllexport)
 extern gchar *
 gst_tensors_info_get_types_string (const GstTensorsInfo * info);
 
@@ -172,6 +190,7 @@ gst_tensors_info_get_types_string (const GstTensorsInfo * info);
  * @return string of names in tensors info (NULL if the number of tensors is 0)
  * @note The returned value should be freed with g_free()
  */
+__declspec(dllexport)
 extern gchar *
 gst_tensors_info_get_names_string (const GstTensorsInfo * info);
 
@@ -180,6 +199,7 @@ gst_tensors_info_get_names_string (const GstTensorsInfo * info);
  * @param info tensors info structure
  * @return TRUE if info is valid
  */
+__declspec(dllexport)
 extern gboolean
 gst_tensors_info_validate (const GstTensorsInfo *info);
 
@@ -187,6 +207,7 @@ gst_tensors_info_validate (const GstTensorsInfo *info);
  * @brief Compare tensors info
  * @return TRUE if equal, FALSE if given tensor infos are invalid or not equal.
  */
+__declspec(dllexport)
 extern gboolean
 gst_tensors_info_is_equal (const GstTensorsInfo * i1, const GstTensorsInfo * i2);
 
@@ -194,6 +215,7 @@ gst_tensors_info_is_equal (const GstTensorsInfo * i1, const GstTensorsInfo * i2)
  * @brief Copy tensor info
  * @note Copied info should be freed with gst_tensors_info_free()
  */
+__declspec(dllexport)
 extern void
 gst_tensors_info_copy (GstTensorsInfo * dest, const GstTensorsInfo * src);
 
@@ -202,6 +224,7 @@ gst_tensors_info_copy (GstTensorsInfo * dest, const GstTensorsInfo * src);
  * @param info GstTensorsInfo structure
  * @return The newly allocated string representing the tensorsinfo. Free after use.
  */
+__declspec(dllexport)
 extern gchar *
 gst_tensors_info_to_string (const GstTensorsInfo * info);
 
@@ -209,6 +232,7 @@ gst_tensors_info_to_string (const GstTensorsInfo * info);
  * @brief Initialize the tensors config info structure (for other/tensors)
  * @param config tensors config structure to be initialized
  */
+__declspec(dllexport)
 extern void
 gst_tensors_config_init (GstTensorsConfig * config);
 
@@ -216,6 +240,7 @@ gst_tensors_config_init (GstTensorsConfig * config);
  * @brief Free allocated data in tensors config structure
  * @param config tensors config structure
  */
+__declspec(dllexport)
 extern void
 gst_tensors_config_free (GstTensorsConfig * config);
 
@@ -224,6 +249,7 @@ gst_tensors_config_free (GstTensorsConfig * config);
  * @param config tensor config structure
  * @return TRUE if configured
  */
+__declspec(dllexport)
 extern gboolean
 gst_tensors_config_validate (const GstTensorsConfig * config);
 
@@ -231,6 +257,7 @@ gst_tensors_config_validate (const GstTensorsConfig * config);
  * @brief Compare tensor config info (for other/tensors)
  * @param TRUE if equal
  */
+__declspec(dllexport)
 extern gboolean
 gst_tensors_config_is_equal (const GstTensorsConfig * c1,
     const GstTensorsConfig * c2);
@@ -238,6 +265,7 @@ gst_tensors_config_is_equal (const GstTensorsConfig * c1,
 /**
  * @brief Copy tensors config
  */
+__declspec(dllexport)
 extern void
 gst_tensors_config_copy (GstTensorsConfig * dest, const GstTensorsConfig * src);
 
@@ -246,6 +274,7 @@ gst_tensors_config_copy (GstTensorsConfig * dest, const GstTensorsConfig * src);
  * @param config tensor config structure
  * @return The newly allocated string representing the config. Free after use.
  */
+__declspec(dllexport)
 extern gchar *
 gst_tensors_config_to_string (const GstTensorsConfig * config);
 
@@ -269,6 +298,7 @@ gst_tensors_config_to_string (const GstTensorsConfig * config);
  * @param dim tensor dimension
  * @return TRUE if dimension is valid
  */
+__declspec(dllexport)
 extern gboolean
 gst_tensor_dimension_is_valid (const tensor_dim dim);
 
@@ -278,6 +308,7 @@ gst_tensor_dimension_is_valid (const tensor_dim dim);
  * @param dimstr The dimension string in the format of d1:d2:d3:d4, d1:d2:d3, d1:d2, or d1, where dN is a positive integer and d1 is the innermost dimension; i.e., dim[d4][d3][d2][d1];
  * @param dim dimension to be filled.
  */
+__declspec(dllexport)
 extern guint
 gst_tensor_parse_dimension (const gchar * dimstr, tensor_dim dim);
 
@@ -287,6 +318,7 @@ gst_tensor_parse_dimension (const gchar * dimstr, tensor_dim dim);
  * @return Formatted string of given dimension (d1:d2:d3:d4).
  * @note The returned value should be freed with g_free()
  */
+__declspec(dllexport)
 extern gchar *
 gst_tensor_get_dimension_string (const tensor_dim dim);
 
@@ -298,6 +330,7 @@ gst_tensor_get_dimension_string (const tensor_dim dim);
  * @note If rank count is 3, then returned string is 'd1:d2:d3`.
  * The returned value should be freed with g_free().
  */
+__declspec(dllexport)
 extern gchar *
 gst_tensor_get_rank_dimension_string (const tensor_dim dim, const unsigned int rank);
 
@@ -306,12 +339,14 @@ gst_tensor_get_rank_dimension_string (const tensor_dim dim, const unsigned int r
  * @return The number of elements. 0 if error.
  * @param dim The tensor dimension
  */
+__declspec(dllexport)
 extern gulong
 gst_tensor_get_element_count (const tensor_dim dim);
 
 /**
  * @brief Get element size of tensor type (byte per element)
  */
+__declspec(dllexport)
 extern gsize
 gst_tensor_get_element_size (tensor_type type);
 
@@ -320,12 +355,14 @@ gst_tensor_get_element_size (tensor_type type);
  * @return Corresponding tensor_type. _NNS_END if unrecognized value is there.
  * @param typestr The string type name, supposed to be one of tensor_element_typename[]
  */
+__declspec(dllexport)
 extern tensor_type
 gst_tensor_get_type (const gchar * typestr);
 
 /**
  * @brief Get type string of tensor type.
  */
+__declspec(dllexport)
 extern const gchar *
 gst_tensor_get_type_string (tensor_type type);
 
@@ -334,12 +371,14 @@ gst_tensor_get_type_string (tensor_type type);
  * @param format_str The string format name, supposed to be one of tensor_format_name[].
  * @return Corresponding tensor_format. _NNS_TENSOR_FORMAT_END if unrecognized value is there.
  */
+__declspec(dllexport)
 extern tensor_format
 gst_tensor_get_format (const gchar * format_str);
 
 /**
  * @brief Get tensor format string.
  */
+__declspec(dllexport)
 extern const gchar *
 gst_tensor_get_format_string (tensor_format format);
 
@@ -349,6 +388,7 @@ gst_tensor_get_format_string (tensor_format format);
  * @param strv Null terminated array of gchar *
  * @param key The key string value
  */
+__declspec(dllexport)
 extern gint
 find_key_strv (const gchar ** strv, const gchar * key);
 
@@ -356,6 +396,7 @@ find_key_strv (const gchar ** strv, const gchar * key);
  * @brief Initialize the tensor meta info structure.
  * @param[in,out] meta tensor meta structure to be initialized
  */
+__declspec(dllexport)
 extern void
 gst_tensor_meta_info_init (GstTensorMetaInfo * meta);
 
@@ -365,6 +406,7 @@ gst_tensor_meta_info_init (GstTensorMetaInfo * meta);
  * @param[out] major pointer to get the major version number
  * @param[out] minor pointer to get the minor version number
  */
+__declspec(dllexport)
 extern void
 gst_tensor_meta_info_get_version (GstTensorMetaInfo * meta, guint * major, guint * minor);
 
@@ -373,6 +415,7 @@ gst_tensor_meta_info_get_version (GstTensorMetaInfo * meta, guint * major, guint
  * @param[in] meta tensor meta structure
  * @return TRUE if given meta is valid
  */
+__declspec(dllexport)
 extern gboolean
 gst_tensor_meta_info_validate (GstTensorMetaInfo * meta);
 
@@ -381,6 +424,7 @@ gst_tensor_meta_info_validate (GstTensorMetaInfo * meta);
  * @param[in] meta tensor meta structure
  * @return Header size for meta info (0 if meta is invalid)
  */
+__declspec(dllexport)
 extern gsize
 gst_tensor_meta_info_get_header_size (GstTensorMetaInfo * meta);
 
@@ -389,6 +433,7 @@ gst_tensor_meta_info_get_header_size (GstTensorMetaInfo * meta);
  * @param[in] meta tensor meta structure
  * @return The data size for meta info (0 if meta is invalid)
  */
+__declspec(dllexport)
 extern gsize
 gst_tensor_meta_info_get_data_size (GstTensorMetaInfo * meta);
 
@@ -399,6 +444,7 @@ gst_tensor_meta_info_get_data_size (GstTensorMetaInfo * meta);
  * @return TRUE if successfully set the header
  * @note User should allocate enough memory for header (see gst_tensor_meta_info_get_header_size()).
  */
+__declspec(dllexport)
 extern gboolean
 gst_tensor_meta_info_update_header (GstTensorMetaInfo * meta, gpointer header);
 
@@ -408,6 +454,7 @@ gst_tensor_meta_info_update_header (GstTensorMetaInfo * meta, gpointer header);
  * @param[in] header pointer to header to be parsed
  * @return TRUE if successfully set the meta
  */
+__declspec(dllexport)
 extern gboolean
 gst_tensor_meta_info_parse_header (GstTensorMetaInfo * meta, gpointer header);
 
@@ -417,13 +464,15 @@ gst_tensor_meta_info_parse_header (GstTensorMetaInfo * meta, gpointer header);
  * @param[out] info GstTensorInfo to be filled
  * @return TRUE if successfully set the info
  */
-gboolean
+__declspec(dllexport)
+extern gboolean
 gst_tensor_meta_info_convert (GstTensorMetaInfo * meta, GstTensorInfo * info);
 
 /**
  * @brief Get the version of NNStreamer.
  * @return Newly allocated string. The returned string should be freed with g_free().
  */
+__declspec(dllexport)
 extern gchar *
 nnstreamer_version_string (void);
 
@@ -433,6 +482,7 @@ nnstreamer_version_string (void);
  * @param[out] minor major.MINOR.micro, won't set if it's null.
  * @param[out] micro major.minor.MICRO, won't set if it's null.
  */
+__declspec(dllexport)
 extern void
 nnstreamer_version_fetch (guint * major, guint * minor, guint * micro);
 
