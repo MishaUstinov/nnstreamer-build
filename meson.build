@@ -2,7 +2,7 @@ project('All GStreamer modules', 'c',
   version : '1.19.2',
   meson_version : '>= 0.54.0',
   default_options : [
-      'buildtype=debugoptimized', 'cpp_std=c++20', 'std=c++20', 'c_std=c11',
+      'buildtype=debugoptimized'
   ])
 
 gst_version = '>= @0@'.format(meson.project_version())
