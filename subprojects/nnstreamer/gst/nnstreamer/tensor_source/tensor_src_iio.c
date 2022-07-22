@@ -82,13 +82,6 @@
 #ifdef G_OS_WIN32
 #include <windows.h>
 #define UNBLOCK_FLAG FIONBIO
-struct pollfd {
-    SOCKET fd;
-    short events;
-    short revents;
-};
-
-#define POLLIN 0x001
 
 #else
 define UNBLOCK_FLAG O_NONBLOCK
@@ -2220,14 +2213,14 @@ gst_tensor_src_iio_setup_device_buffer (GstTensorSrcIIO * self)
   filename = g_build_filename (self->dev_dir, device_name, NULL);
   g_free (device_name);
 
-  self->buffer_data_fp = g_new (struct pollfd, 1);
+  self->buffer_data_fp = g_new (GPollFD, 1);
   if (self->buffer_data_fp == NULL) {
     GST_ERROR_OBJECT (self, "Failed to allocate the file descriptor.");
     g_free (filename);
     goto error_return;
   }
 
-  self->buffer_data_fp->events = POLLIN;
+  self->buffer_data_fp->events = G_IO_IN;
   self->buffer_data_fp->fd = open (filename, O_RDONLY | UNBLOCK_FLAG);
   if (self->buffer_data_fp->fd < 0) {
     GST_ERROR_OBJECT (self, "Failed to open buffer %s for device %s.\n",
@@ -2779,14 +2772,14 @@ gst_tensor_src_iio_fill (GstBaseSrc * src, guint64 offset, guint size,
   time_to_end = g_get_real_time () + self->poll_timeout * 1000;
   while (TRUE) {
     if (self->trigger.name != NULL) {
-      status = poll (self->buffer_data_fp, 1, self->poll_timeout);
+        status = g_poll (self->buffer_data_fp, 1, self->poll_timeout);
       if (status < 0) {
         GST_ERROR_OBJECT (self, "Error %d while polling the buffer.", status);
         goto error_data_free;
       } else if (status == 0) {
         GST_ERROR_OBJECT (self, "Timeout while polling the buffer.");
         goto error_data_free;
-      } else if (!(self->buffer_data_fp->revents & POLLIN)) {
+      } else if (!(self->buffer_data_fp->revents & G_IO_IN)) {
         GST_ERROR_OBJECT (self, "Poll succeeded on an unexpected event %d.",
             self->buffer_data_fp->revents);
         goto error_data_free;

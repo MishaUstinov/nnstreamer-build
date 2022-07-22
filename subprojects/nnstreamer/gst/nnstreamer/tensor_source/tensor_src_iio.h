@@ -31,9 +31,8 @@
 #include <gst/base/gstbasesrc.h>
 #include <glib/gprintf.h>
 #include <tensor_common.h>
-#ifndef G_OS_WIN32
-#include <poll.h>
-#endif
+#include <gpoll.h>
+
 
 G_BEGIN_DECLS
 #define GST_TYPE_TENSOR_SRC_IIO \
@@ -121,7 +120,7 @@ struct _GstTensorSrcIIO
   GHashTable *custom_channel_table; /**< table of idx of channels to be enabled */
   channels_enabled_options channels_enabled; /**< enabling which channels */
   guint scan_size; /**< size for a single scan of buffer length 1 */
-  struct pollfd *buffer_data_fp; /**< pollfd for reading data buffer */
+  GPollFD *buffer_data_fp; /**< pollfd for reading data buffer */
   guint num_channels_enabled; /**< channels to be enabled */
   gboolean merge_channels_data; /**< merge channel data with same type/size */
   gboolean is_tensor; /**< False if tensors is used for data */
