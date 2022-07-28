@@ -66,12 +66,14 @@ G_BEGIN_DECLS
  */
 #ifdef __MACOS__
 #define NNSTREAMER_SO_FILE_EXTENSION	".dylib"
+#elif defined(G_OS_WIN32)
+#define NNSTREAMER_SO_FILE_EXTENSION	".dll"
 #else
 #define NNSTREAMER_SO_FILE_EXTENSION	".so"
 #endif
 
 /* Internal Hardcoded Values */
-#define NNSTREAMER_DEFAULT_CONF_FILE    "/etc/nnstreamer.ini"
+#define NNSTREAMER_DEFAULT_CONF_FILE    "C:\\lib\\nnstreamer\\nnstreamer.ini"
 #ifndef NNSTREAMER_CONF_FILE
 #define NNSTREAMER_CONF_FILE NNSTREAMER_DEFAULT_CONF_FILE
 #endif

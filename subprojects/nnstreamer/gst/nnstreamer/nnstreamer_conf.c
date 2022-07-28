@@ -35,11 +35,18 @@
  * designate them with the full path.
  */
 
+#ifdef G_OS_WIN32
+#define LIB_PREFIX ""
+#else
+#define LIB_PREFIX "lib"
+#endif // G_OS_WIN32
+
+
 /* Subplugin Naming Rules */
-#define NNSTREAMER_PREFIX_DECODER	"libnnstreamer_decoder_"
-#define NNSTREAMER_PREFIX_FILTER	"libnnstreamer_filter_"
+#define NNSTREAMER_PREFIX_DECODER	LIB_PREFIX "nnstreamer_decoder_"
+#define NNSTREAMER_PREFIX_FILTER	LIB_PREFIX "nnstreamer_filter_"
 #define NNSTREAMER_PREFIX_CUSTOMFILTERS	""
-#define NNSTREAMER_PREFIX_CONVERTER	"libnnstreamer_converter_"
+#define NNSTREAMER_PREFIX_CONVERTER	LIB_PREFIX "nnstreamer_converter_"
 /* Custom filter does not have prefix */
 
 /* Env-var names */
@@ -380,7 +387,7 @@ nnsconf_loadconf (gboolean force_reload)
     if (g_path_is_absolute (NNSTREAMER_CONF_FILE)) {
       conf.conffile = g_strdup (NNSTREAMER_CONF_FILE);
     } else {
-      /** default value of 'sysconfdir' in meson is 'etc' */
+        /** default value of 'sysconfdir' in meson is 'etc' */
       conf.conffile = g_build_path (G_DIR_SEPARATOR_S, root_path_prefix,
           NNSTREAMER_CONF_FILE, NULL);
     }
