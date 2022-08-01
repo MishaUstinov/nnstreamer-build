@@ -22,6 +22,7 @@
 
 #include <nnstreamer_cppplugin_api_filter.hh>
 #include <tensor_common.h>
+#include <nnstreamer_conf.h>
 #include <nnstreamer_util.h>
 
 #include <NvInfer.h>

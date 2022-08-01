@@ -7,6 +7,7 @@
  * @bug         No known bugs
  */
 #include "cppfilter_test.hh"
+#include <nnstreamer_conf.h>
 #include <nnstreamer_util.h>
 
 /** @brief API method */

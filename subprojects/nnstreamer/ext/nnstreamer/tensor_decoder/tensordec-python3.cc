@@ -14,6 +14,7 @@
  */
 
 #include <nnstreamer_plugin_api_decoder.h>
+#include <nnstreamer_conf.h>
 #include <nnstreamer_util.h>
 #include "tensordecutil.h"
 #include "nnstreamer_python3_helper.h"

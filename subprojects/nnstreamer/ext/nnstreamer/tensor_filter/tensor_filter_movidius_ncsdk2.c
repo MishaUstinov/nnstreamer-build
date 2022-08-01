@@ -32,6 +32,7 @@
 #include <gst/gst.h>
 #include <mvnc2/mvnc.h>
 #include <nnstreamer_log.h>
+#include <nnstreamer_conf.h>
 #include <nnstreamer_util.h>
 #define NO_ANONYMOUS_NESTED_STRUCT
 #include <nnstreamer_plugin_api_filter.h>

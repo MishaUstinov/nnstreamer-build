@@ -34,6 +34,7 @@
 #include <string>
 #include <typeinfo>
 #include <nnstreamer_plugin_api_converter.h>
+#include <nnstreamer_conf.h>
 #include <nnstreamer_util.h>
 #include "nnstreamer_protobuf.h"
 #include "tensor_converter_util.h"

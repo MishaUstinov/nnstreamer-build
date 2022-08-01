@@ -94,6 +94,7 @@
 
 #include <mxnet-cpp/MxNetCpp.h>
 #include <mxnet/lib_api.h>
+#include <nnstreamer_conf.h>
 
 using nnstreamer::tensor_filter_subplugin;
 using namespace mxnet::cpp;

@@ -37,6 +37,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <nnstreamer_conf.h>
 #include <nnstreamer_util.h>
 #include "tensor_filter_openvino.hh"
 

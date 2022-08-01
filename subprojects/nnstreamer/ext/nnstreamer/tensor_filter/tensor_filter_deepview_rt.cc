@@ -18,6 +18,7 @@
 #include <thread>
 #include <unistd.h>
 #include <vector>
+#include <nnstreamer_conf.h>
 
 
 #define DVRT_SUBPLUGIN_NAME "deepview-rt"

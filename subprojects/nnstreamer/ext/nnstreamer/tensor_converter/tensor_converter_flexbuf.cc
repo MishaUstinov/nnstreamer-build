@@ -60,6 +60,7 @@
 #include <nnstreamer_log.h>
 #include <nnstreamer_plugin_api.h>
 #include <nnstreamer_plugin_api_converter.h>
+#include <nnstreamer_conf.h>
 #include <nnstreamer_util.h>
 #include <flatbuffers/flexbuffers.h>
 #include "tensor_converter_util.h"

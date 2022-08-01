@@ -18,6 +18,7 @@
 #include <stdexcept>
 #include <string>
 
+#include <nnstreamer_conf.h>
 #include <nnstreamer_cppplugin_api_filter.hh>
 #include <tensor_common.h>
 

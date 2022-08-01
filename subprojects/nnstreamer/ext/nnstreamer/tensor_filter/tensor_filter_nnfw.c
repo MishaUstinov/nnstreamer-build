@@ -37,6 +37,7 @@
 #define NO_ANONYMOUS_NESTED_STRUCT
 #include <nnstreamer_plugin_api_filter.h>
 #undef NO_ANONYMOUS_NESTED_STRUCT
+#include <nnstreamer_conf.h>
 #include <nnstreamer_util.h>
 #include <nnfw.h>
 

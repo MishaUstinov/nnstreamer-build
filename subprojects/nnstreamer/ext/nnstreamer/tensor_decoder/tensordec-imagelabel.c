@@ -34,6 +34,7 @@
 #include <nnstreamer_plugin_api_decoder.h>
 #include <nnstreamer_plugin_api.h>
 #include <nnstreamer_log.h>
+#include <nnstreamer_conf.h>
 #include <nnstreamer_util.h>
 #include "tensordecutil.h"
 
