@@ -102,6 +102,7 @@ typedef struct _GstTensorDecoderDef
  * @param[in] decoder Decoder sub-plugin to be registered.
  * @return TRUE if registered. FALSE is failed or duplicated.
  */
+__declspec(dllexport)
 extern int
 nnstreamer_decoder_probe (GstTensorDecoderDef * decoder);
 
@@ -109,6 +110,7 @@ nnstreamer_decoder_probe (GstTensorDecoderDef * decoder);
  * @brief Decoder's sub-plugin may call this to unregister itself.
  * @param[in] name The name of decoder sub-plugin.
  */
+__declspec(dllexport)
 extern void
 nnstreamer_decoder_exit (const char *name);
 
@@ -117,12 +119,14 @@ nnstreamer_decoder_exit (const char *name);
  * @param[in] name The name of decoder sub-plugin.
  * @return NULL if not found or the sub-plugin object has an error.
  */
+__declspec(dllexport)
 extern const GstTensorDecoderDef *
 nnstreamer_decoder_find (const char *name);
 
 /**
  * @brief set custom property description for tensor decoder sub-plugin
  */
+__declspec(dllexport)
 extern void
 nnstreamer_decoder_set_custom_property_desc (const char *name, const char *prop, ...);
 

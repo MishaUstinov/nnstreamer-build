@@ -2,7 +2,6 @@ nnstchk_deps = [
   glib_dep,
   gst_dep,
   gst_base_dep,
-  libdl_dep,
 ]
 
 nnstchk_exec = executable('nnstreamer-check',

@@ -80,8 +80,7 @@ static const gchar *nnfw_accl_auto = ACCL_CPU_STR;
 #endif
 static const gchar *nnfw_accl_default = ACCL_CPU_STR;
 
-void init_filter_nnfw (void) __attribute__((constructor));
-void fini_filter_nnfw (void) __attribute__((destructor));
+REGISTER_FILTER(filter_nnfw);
 
 static GstTensorFilterFrameworkStatistics nnfw_internal_stats = {
   .total_invoke_num = 0,

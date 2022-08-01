@@ -67,8 +67,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */
-void init_flxd (void) __attribute__ ((constructor));
-void fini_flxd (void) __attribute__ ((destructor));
+REGISTER_FILTER(flxd);
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */

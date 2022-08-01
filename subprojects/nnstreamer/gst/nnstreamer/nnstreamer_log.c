@@ -8,9 +8,9 @@
  * @bug		No known bugs except for NYI items
  */
 
+#include <glib.h>
 
-
-#if !defined(__ANDROID__) && !defined(__CYGWIN__)
+#if !defined(__ANDROID__) && !defined(G_OS_WIN32)
 /* Android does not have execinfo.h. It has unwind.h instead. */
 #include <execinfo.h>
 #endif
@@ -18,7 +18,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
-#include <glib.h>
 
 #include "nnstreamer_log.h"
 
@@ -32,7 +31,7 @@ _backtrace_to_string (void)
 {
   char *retstr = NULL;
 
-#if !defined(__ANDROID__) && !defined(__CYGWIN__)
+#if !defined(__ANDROID__) && !defined(G_OS_WIN32)
 /* Android does not have execinfo.h. It has unwind.h instead. */
   void *array[20];
   char **strings;
@@ -93,7 +92,6 @@ _nnstreamer_error (void)
 /**
  * @brief overwrites the error message buffer with the new message.
  */
-__attribute__((__format__ (__printf__, 1, 2)))
      void _nnstreamer_error_write (const char *fmt, ...)
 {
   /** The attribute is for clang workaround in macos:

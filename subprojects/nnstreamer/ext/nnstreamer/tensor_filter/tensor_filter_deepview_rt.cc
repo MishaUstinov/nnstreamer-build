@@ -46,8 +46,7 @@ namespace tensorfilter_dvrt
 {
 
 extern "C" {
-void _init_filter_dvrt (void) __attribute__ ((constructor));
-void _fini_filter_dvrt (void) __attribute__ ((destructor));
+REGISTER_FILTER(_filter_dvrt);
 }
 
 /**

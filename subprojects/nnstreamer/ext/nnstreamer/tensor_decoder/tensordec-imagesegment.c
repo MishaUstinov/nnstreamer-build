@@ -96,8 +96,7 @@
 #define RGBA_CHANNEL    (4)
 #define MAX_RGB         (255)
 
-void init_is (void) __attribute__ ((constructor));
-void fini_is (void) __attribute__ ((destructor));
+REGISTER_FILTER(is);
 
 static const float DETECTION_THRESHOLD = 0.5f;
 

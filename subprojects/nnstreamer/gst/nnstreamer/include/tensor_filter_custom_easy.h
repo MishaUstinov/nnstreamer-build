@@ -59,6 +59,7 @@ G_BEGIN_DECLS
  * @note NNS_custom_invoke defined in tensor_filter_custom.h
  *       Output buffers for func are preallocated.
  */
+__declspec(dllexport)
 extern int NNS_custom_easy_register (const char * modelname,
     NNS_custom_invoke func, void *data,
     const GstTensorsInfo * in_info, const GstTensorsInfo * out_info);
@@ -68,6 +69,7 @@ extern int NNS_custom_easy_register (const char * modelname,
  * @param[in] modelname The registered name of custom-easy tensor function.
  * @return 0 if success, non-zero if error
  */
+__declspec(dllexport)
 extern int NNS_custom_easy_unregister (const char * modelname);
 
 G_END_DECLS

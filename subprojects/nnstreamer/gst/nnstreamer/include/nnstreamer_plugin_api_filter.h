@@ -502,6 +502,7 @@ struct _GstTensorFilterFramework
  *
  * @note Do not change the subplugins callbacks after probing the filter.
  */
+__declspec(dllexport)
 extern int
 nnstreamer_filter_probe (GstTensorFilterFramework * tfsp);
 
@@ -509,6 +510,7 @@ nnstreamer_filter_probe (GstTensorFilterFramework * tfsp);
  * @brief Filter's sub-plugin may call this to unregister itself.
  * @param[in] name The name of filter sub-plugin.
  */
+__declspec(dllexport)
 extern void
 nnstreamer_filter_exit (const char *name);
 
@@ -517,24 +519,28 @@ nnstreamer_filter_exit (const char *name);
  * @param[in] name The name of filter sub-plugin.
  * @return NULL if not found or the sub-plugin object has an error.
  */
+__declspec(dllexport)
 extern const GstTensorFilterFramework *
 nnstreamer_filter_find (const char *name);
 
 /**
  * @brief set custom property description for tensor filter sub-plugin
  */
+__declspec(dllexport)
 extern void
 nnstreamer_filter_set_custom_property_desc (const char *name, const char *prop, ...);
 
 /**
  * @brief return accl_hw type from string
  */
+__declspec(dllexport)
 extern accl_hw
 get_accl_hw_type (const char * str);
 
 /**
  * @brief return string based on accl_hw type
  */
+__declspec(dllexport)
 extern const char *
 get_accl_hw_str (const accl_hw key);
 
@@ -560,6 +566,7 @@ typedef struct {
  *       - auto_accl: auto accelerator (optional)
  *       - def_accl: default accelerator (optional)
  */
+__declspec(dllexport)
 extern accl_hw parse_accl_hw_fill (parse_accl_args accl_args);
 
 /**
@@ -585,6 +592,7 @@ nnstreamer_filter_shared_model_get (void *instance, const char *key);
  * @param[in] interpreter The interpreter to be shared.
  * @return The model interpreter inserted. NULL if it is already inserted.
  */
+__declspec(dllexport)
 extern void *
 nnstreamer_filter_shared_model_insert_and_get (void *instance, char *key, void *interpreter);
 
@@ -597,6 +605,7 @@ nnstreamer_filter_shared_model_insert_and_get (void *instance, char *key, void *
  * @param[in] free_callback The callback function to destroy the interpreter, which takes the interpreter as arg.
  * @return TRUE if the instance is removed. FALSE if failed to remove it.
  */
+__declspec(dllexport)
 extern int
 nnstreamer_filter_shared_model_remove (void *instance, const char *key,
     void (*free_callback) (void *));
@@ -611,6 +620,7 @@ nnstreamer_filter_shared_model_remove (void *instance, const char *key,
  * @param[in] replace_callback The callback function to replace with new interpreter.
  * @param[in] free_callback The callback function to destroy the old interpreter.
  */
+__declspec(dllexport)
 extern void
 nnstreamer_filter_shared_model_replace (void *instance, const char *key,
     void *new_interpreter, void (*replace_callback) (void *, void *), void (*free_callback) (void*));

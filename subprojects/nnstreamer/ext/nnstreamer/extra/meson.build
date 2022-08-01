@@ -38,7 +38,7 @@ if grpc_support_is_available
 
   grpc_util_dep = declare_dependency(
     sources: grpc_util_sources,
-    dependencies: [nnstreamer_dep, glib_dep, gst_dep, libdl_dep, grpc_support_deps, ignore_unused_param_auto_generated_files],
+    dependencies: [nnstreamer_dep, glib_dep, gst_dep, grpc_support_deps, ignore_unused_param_auto_generated_files],
     include_directories: include_directories('.')
   )
 
@@ -79,7 +79,7 @@ if grpc_support_is_available
 endif
 
 if have_python3
-  nnstreamer_python3_deps = [python3_dep, libdl_dep, glib_dep, gst_dep, nnstreamer_dep]
+  nnstreamer_python3_deps = [python3_dep, glib_dep, gst_dep, nnstreamer_dep]
   nnstreamer_python3_src = ['nnstreamer_python3_helper.cc']
   nnstreamer_python3_sources = []
 

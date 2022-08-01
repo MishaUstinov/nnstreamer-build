@@ -133,8 +133,7 @@ class PYCore
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */
-void init_filter_py (void) __attribute__((constructor));
-void fini_filter_py (void) __attribute__((destructor));
+REGISTER_FILTER(filter_py);
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */

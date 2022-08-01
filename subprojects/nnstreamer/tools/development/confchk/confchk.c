@@ -19,7 +19,9 @@
  */
 #include <glib.h>
 #include <gst/gst.h>
+#ifndef G_OS_WIN32
 #include <dlfcn.h>
+#endif
 
 #define STR_BOOL(x) ((x) ? "TRUE" : "FALSE")
 
@@ -35,6 +37,10 @@ get_nnsconf_dump (const gchar * path)
   void (*nnsconf_subplugin_dump) (gchar * str, gulong size);
   gchar dump[8192];
 
+#ifdef G_OS_WIN32
+  g_printerr("nnsconf_dump not supported on windows %s\n", path);
+  return -1;
+#else
   handle = dlopen (path, RTLD_LAZY);
   if (!handle) {
     g_printerr ("Error opening %s: %s\n", path, dlerror ());
@@ -74,6 +80,7 @@ get_nnsconf_dump (const gchar * path)
   dlclose (handle);
 
   return 0;
+#endif // G_OS_WIN32
 }
 
 /**

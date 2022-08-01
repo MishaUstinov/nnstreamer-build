@@ -107,8 +107,7 @@
 #include <nnstreamer_util.h>
 #include "tensordecutil.h"
 
-void init_bb (void) __attribute__ ((constructor));
-void fini_bb (void) __attribute__ ((destructor));
+REGISTER_FILTER(bb);
 
 /* font.c */
 extern uint8_t rasters[][13];

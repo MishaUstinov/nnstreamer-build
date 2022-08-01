@@ -19,13 +19,11 @@ elif cc.has_header_symbol('android/log.h', '__android_log_print')
 endif
 
 nnstreamer_deps = [
-  libm_dep,
   gst_dep,
   gst_base_dep,
   gst_controller_dep,
   gst_video_dep,
   gst_audio_dep,
-  thread_dep,
   gio_dep
 ]
 
@@ -136,13 +134,6 @@ nnstreamer_shared = shared_library('nnstreamer',
 # target_name = nnstreamer_shared.name()
 libpath_split = nnstreamer_shared.full_path().split('/')
 target_name = libpath_split[libpath_split.length() - 1]
-
-meson.add_install_script(
-  'sh', '-c',
-  'ln -fs @0@ @1@@2@'.format(
-    join_paths(plugins_install_dir, target_name),
-    '${DESTDIR}',
-    join_paths(nnstreamer_libdir, target_name)))
 
 nnstreamer_static = static_library('nnstreamer',
   nnstreamer_sources,

@@ -30,8 +30,7 @@
 #include <nnstreamer_subplugin.h>
 #include <nnstreamer_util.h>
 
-void init_filter_custom_easy (void) __attribute__((constructor));
-void fini_filter_custom_easy (void) __attribute__((destructor));
+//REGISTER_FILTER(filter_custom_easy);
 
 /**
  * @brief internal_data

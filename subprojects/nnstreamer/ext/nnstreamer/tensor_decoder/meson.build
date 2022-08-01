@@ -60,13 +60,13 @@ endforeach
 
 shared_library('nnstreamer_decoder_bounding_boxes',
   nnstreamer_decoder_bounding_boxes_sources,
-  dependencies: [nnstreamer_dep, glib_dep, gst_dep, libm_dep],
+  dependencies: [nnstreamer_dep, glib_dep, gst_dep],
   install: true,
   install_dir: decoder_subplugin_install_dir
 )
 static_library('nnstreamer_decoder_bounding_boxes',
   nnstreamer_decoder_bounding_boxes_sources,
-  dependencies: [nnstreamer_dep, glib_dep, gst_dep, libm_dep],
+  dependencies: [nnstreamer_dep, glib_dep, gst_dep],
   install: true,
   install_dir: nnstreamer_libdir
 )

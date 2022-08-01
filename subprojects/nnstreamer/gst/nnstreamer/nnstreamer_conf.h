@@ -43,18 +43,48 @@ G_BEGIN_DECLS
 #define NNSTREAMER_SYS_ROOT_PATH_PREFIX "/"
 #endif /* G_OS_WIN32 */
 
+/* Filter init/clear functions registration */
+#ifdef G_OS_WIN32
+#include <Windows.h>
+
+#define REGISTER_FILTER(filter) \
+void init_##filter(void); \
+void fini_##filter(void); \
+extern BOOL APIENTRY DllMain(HMODULE hModule, \
+    DWORD  ul_reason_for_call, \
+    LPVOID lpReserved \
+) { \
+    switch (ul_reason_for_call) \
+    { \
+    case DLL_PROCESS_ATTACH: \
+        init_##filter(); \
+        break; \
+    case DLL_PROCESS_DETACH: \
+        fini_##filter(); \
+        break; \
+    } \
+    return TRUE; \
+}
+#else
+#define REGISTER_FILTER(filter) \
+    void init_##filter (void) __attribute__((constructor)); \
+    void fini_##filter (void) __attribute__((destructor));
+#endif /* G_OS_WIN32 */
+
 /**
  * Hard-coded system-dependent file extension string of shared
  * (dynamic loadable) object
  */
 #ifdef __MACOS__
 #define NNSTREAMER_SO_FILE_EXTENSION	".dylib"
+#elif defined(G_OS_WIN32)
+#define NNSTREAMER_SO_FILE_EXTENSION	".dll"
 #else
 #define NNSTREAMER_SO_FILE_EXTENSION	".so"
 #endif
 
 /* Internal Hardcoded Values */
-#define NNSTREAMER_DEFAULT_CONF_FILE    "/etc/nnstreamer.ini"
+#define NNSTREAMER_DEFAULT_CONF_FILE    "C:\\lib\\nnstreamer\\nnstreamer.ini"
 #ifndef NNSTREAMER_CONF_FILE
 #define NNSTREAMER_CONF_FILE NNSTREAMER_DEFAULT_CONF_FILE
 #endif
@@ -82,6 +112,7 @@ typedef struct
  * @param[in] force_reload TRUE if you want to clean up and load conf again.
  * @return TRUE if successful or skipped. FALSE if error reading something.
  */
+__declspec(dllexport)
 extern gboolean
 nnsconf_loadconf (gboolean force_reload);
 
@@ -94,6 +125,7 @@ nnsconf_loadconf (gboolean force_reload);
  *
  * This is mainly supposed to be used by CUSTOM_FILTERS
  */
+__declspec(dllexport)
 extern const gchar *
 nnsconf_get_fullpath (const gchar * subpluginname, nnsconf_type_path type);
 
@@ -103,6 +135,7 @@ nnsconf_get_fullpath (const gchar * subpluginname, nnsconf_type_path type);
  * @param[in] fullpath The full path to the file.
  * @return True if the file is regular and can be added to the list.
  */
+__declspec(dllexport)
 extern gboolean
 nnsconf_validate_file (nnsconf_type_path type, const gchar * fullpath);
 
@@ -111,6 +144,7 @@ nnsconf_validate_file (nnsconf_type_path type, const gchar * fullpath);
  * @param[in] type The type (FILTERS/DECODERS/CUSTOM_FILTERS)
  * @return Predefined prefix string for given type.
  */
+__declspec(dllexport)
 extern const gchar *
 nnsconf_get_subplugin_name_prefix (nnsconf_type_path type);
 
@@ -121,6 +155,7 @@ nnsconf_get_subplugin_name_prefix (nnsconf_type_path type);
  * @return total number of sub-plugins for given type
  * @note DO NOT free sub-plugins info
  */
+__declspec(dllexport)
 extern guint
 nnsconf_get_subplugin_info (nnsconf_type_path type, subplugin_info_s * info);
 
@@ -140,6 +175,7 @@ nnsconf_get_subplugin_info (nnsconf_type_path type, subplugin_info_s * info);
  * @param[in] key The key name, key = value, in .ini file.
  * @return The newly allocated string. A caller must free it. NULL if it's not available.
  */
+__declspec(dllexport)
 extern gchar *
 nnsconf_get_custom_value_string (const gchar * group, const gchar * key);
 
@@ -160,6 +196,7 @@ nnsconf_get_custom_value_string (const gchar * group, const gchar * key);
  * @param[in] def The default return value in case there is no value available.
  * @return The value interpreted as TRUE/FALSE.
  */
+__declspec(dllexport)
 extern gboolean
 nnsconf_get_custom_value_bool (const gchar * group, const gchar * key, gboolean def);
 
@@ -168,8 +205,8 @@ nnsconf_get_custom_value_bool (const gchar * group, const gchar * key, gboolean 
  * @param[out] str Preallocated string for the output (dump).
  * @param[in] size The size of given str.
  */
-extern void
-nnsconf_dump (gchar * str, gulong size);
+//extern void
+//nnsconf_dump (gchar * str, gulong size);
 
 extern void
 nnsconf_subplugin_dump (gchar * str, gulong size);

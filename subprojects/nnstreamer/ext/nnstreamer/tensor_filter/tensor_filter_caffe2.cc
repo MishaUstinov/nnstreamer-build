@@ -85,8 +85,7 @@ class Caffe2Core
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */
-void init_filter_caffe2 (void) __attribute__((constructor));
-void fini_filter_caffe2 (void) __attribute__((destructor));
+REGISTER_FILTER(filter_caffe2);
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */

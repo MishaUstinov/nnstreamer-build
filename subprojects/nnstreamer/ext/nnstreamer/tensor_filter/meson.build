@@ -143,7 +143,7 @@ if tflite_support_is_available
     nnstreamer_filter_tflite_sources += join_paths(meson.current_source_dir(), s)
   endforeach
 
-  nnstreamer_filter_tflite_deps = tflite_support_deps + [thread_dep, libdl_dep, glib_dep, nnstreamer_single_dep]
+  nnstreamer_filter_tflite_deps = tflite_support_deps + [glib_dep, nnstreamer_single_dep]
 
   # Since tf-1.13, tflite has moved from contrib to core
   tflite_h_prefix='#include <tensorflow/lite/model.h>'
@@ -211,7 +211,7 @@ if tflite2_support_is_available
     nnstreamer_filter_tflite2_sources += join_paths(meson.current_source_dir(), s)
   endforeach
 
-  nnstreamer_filter_tflite2_deps = tflite2_support_deps + [thread_dep, libdl_dep, nnstreamer_single_dep]
+  nnstreamer_filter_tflite2_deps = tflite2_support_deps + [thread_dep, nnstreamer_single_dep]
 
   tflite2_compile_args = []
   tflite2_compile_args += '-DTFLITE_INT8=1'
@@ -238,7 +238,7 @@ if tflite2_support_is_available
         #include "tensorflow/lite/delegates/gpu/delegate.h"
         TfLiteGpuDelegateOptionsV2 gpu_options = TfLiteGpuDelegateOptionsV2Default ();
         int main() {return 0;}
-      ''', dependencies : [tflite2_support_deps, libdl_dep], name : 'gpu delegate')
+      ''', dependencies : [tflite2_support_deps], name : 'gpu delegate')
     tflite2_compile_args += '-DTFLITE_GPU_DELEGATE_SUPPORTED'
   endif
 
@@ -256,7 +256,7 @@ if tflite2_support_is_available
       #include "tensorflow/lite/delegates/external/external_delegate.h"
       TfLiteExternalDelegateOptions external_options = TfLiteExternalDelegateOptionsDefault ("");
       int main() {return 0;}
-    ''', dependencies : [tflite2_support_deps, libdl_dep], name : 'external delegate')
+    ''', dependencies : [tflite2_support_deps], name : 'external delegate')
     tflite2_compile_args += '-DTFLITE_EXTERNAL_DELEGATE_SUPPORTED'
   endif
 
@@ -353,7 +353,7 @@ if tflite2_support_is_available
       )
       shared_library('nnstreamer_filter_tensorflow2-lite-custom',
         nnstreamer_filter_tflite2_sources,
-        dependencies: [tflc_dep, thread_dep, libdl_dep, nnstreamer_single_dep, tflite2_ver_dep, tflite2_custom_extra_dep],
+        dependencies: [tflc_dep, nnstreamer_single_dep, tflite2_ver_dep, tflite2_custom_extra_dep],
         install: true,
         install_dir:filter_subplugin_install_dir
       )
@@ -419,31 +419,6 @@ if caffe2_support_is_available
   static_library('nnstreamer_filter_caffe2',
     nnstreamer_filter_caffe2_sources,
     dependencies: nnstreamer_filter_caffe2_deps,
-    install: true,
-    install_dir: nnstreamer_libdir
-  )
-endif
-
-if deepview_rt_support_is_available
-  nnstreamer_filter_deepview_rt_deps = deepview_rt_support_deps + [glib_dep, gst_dep, nnstreamer_dep]
-
-  filter_sub_deepview_rt_sources = ['tensor_filter_deepview_rt.cc']
-
-  nnstreamer_filter_deepview_rt_sources = []
-  foreach s : filter_sub_deepview_rt_sources
-    nnstreamer_filter_deepview_rt_sources += join_paths(meson.current_source_dir(), s)
-  endforeach
-
-  shared_library('nnstreamer_filter_deepview-rt',
-    nnstreamer_filter_deepview_rt_sources,
-    dependencies: nnstreamer_filter_deepview_rt_deps,
-    install: true,
-    install_dir: filter_subplugin_install_dir
-  )
-
-  static_library('nnstreamer_filter_deepview-rt',
-    nnstreamer_filter_deepview_rt_sources,
-    dependencies: nnstreamer_filter_deepview_rt_deps,
     install: true,
     install_dir: nnstreamer_libdir
   )
@@ -545,7 +520,7 @@ if get_option('enable-edgetpu')
     endif
   endif
 
-  nnstreamer_filter_edgetpu_deps = [glib_dep, gst_dep, nnstreamer_dep, edgetpu_dep, libdl_dep]
+  nnstreamer_filter_edgetpu_deps = [glib_dep, gst_dep, nnstreamer_dep, edgetpu_dep]
 
   if tflite2_support_is_available
     nnstreamer_filter_edgetpu_deps += [tflite2_support_deps, tflite2_ver_dep]
@@ -704,38 +679,6 @@ if get_option('enable-mediapipe')
   )
 endif
 
-run_command('sh', '-c', 'touch filter_snpe_list', check : true)
-if snpe_support_is_available
-  filter_sub_snpe_sources = ['tensor_filter_snpe.cc']
-
-  snpe_cpp_args = []
-  snpe_cpp_args += '-Wno-terminate'
-
-  nnstreamer_filter_snpe_sources = []
-  foreach s : filter_sub_snpe_sources
-    nnstreamer_filter_snpe_sources += join_paths(meson.current_source_dir(), s)
-  endforeach
-
-  nnstreamer_filter_snpe_deps = [glib_dep, gst_dep, nnstreamer_dep, snpe_support_deps]
-
-  shared_library('nnstreamer_filter_snpe',
-    nnstreamer_filter_snpe_sources,
-    cpp_args: snpe_cpp_args,
-    dependencies: nnstreamer_filter_snpe_deps,
-    install: true,
-    install_dir: filter_subplugin_install_dir
-  )
-
-  static_library('nnstreamer_filter_snpe',
-    nnstreamer_filter_snpe_sources,
-    cpp_args: snpe_cpp_args,
-    dependencies: nnstreamer_filter_snpe_deps,
-    install: true,
-    install_dir: nnstreamer_libdir
-  )
-  run_command('sh', '-c', 'echo "%{_prefix}/lib/nnstreamer/filters/libnnstreamer_filter_snpe.so" >> filter_snpe_list', check : true)
-endif
-
 if tensorrt_support_is_available
   filter_sub_tensorrt_sources = ['tensor_filter_tensorrt.cc']
 
@@ -857,7 +800,7 @@ if mxnet_support_is_available
     nnstreamer_filter_mxnet_sources += join_paths(meson.current_source_dir(), s)
   endforeach
 
-  nnstreamer_filter_mxnet_deps = mxnet_support_deps + [glib_dep, gst_dep, nnstreamer_dep, libdl_dep]
+  nnstreamer_filter_mxnet_deps = mxnet_support_deps + [glib_dep, gst_dep, nnstreamer_dep]
 
   nnstreamer_filter_mxnet_so_lib = shared_library('nnstreamer_filter_mxnet',
     nnstreamer_filter_mxnet_sources,

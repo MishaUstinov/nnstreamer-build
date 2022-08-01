@@ -72,8 +72,7 @@ namespace tensorfilter_tensorrt
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */
-void _init_filter_tensorrt (void) __attribute__((constructor));
-void _fini_filter_tensorrt (void) __attribute__((destructor));
+REGISTER_FILTER(filter_tensorrt);
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */

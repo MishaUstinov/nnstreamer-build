@@ -21,8 +21,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */
-void init_decoder_py (void) __attribute__ ((constructor));
-void fini_decoder_py (void) __attribute__ ((destructor));
+REGISTER_FILTER(decoder_py);
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */

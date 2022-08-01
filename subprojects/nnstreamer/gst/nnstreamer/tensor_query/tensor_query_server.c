@@ -29,8 +29,7 @@ G_LOCK_DEFINE_STATIC (query_server_table);
  */
 static GHashTable *_qs_table = NULL;
 
-static void init_queryserver (void) __attribute__((constructor));
-static void fini_queryserver (void) __attribute__((destructor));
+//REGISTER_FILTER(queryserver);
 
 /**
  * @brief Getter to get nth GstTensorQueryServerInfo.
@@ -239,8 +238,7 @@ gst_tensor_query_server_get_sink_port (query_server_info_handle server_info_h)
 /**
  * @brief Initialize the query server.
  */
-static void
-init_queryserver (void)
+void init_queryserver (void)
 {
   G_LOCK (query_server_table);
   g_assert (NULL == _qs_table); /** Internal error (duplicated init call?) */
@@ -251,8 +249,7 @@ init_queryserver (void)
 /**
  * @brief Destruct the query server.
  */
-static void
-fini_queryserver (void)
+void fini_queryserver (void)
 {
   G_LOCK (query_server_table);
   g_assert (_qs_table); /** Internal error (init not called?) */
