@@ -366,7 +366,6 @@ static GstTensorDecoderDef directVideo = {
 void
 init_dv (void)
 {
-    g_print("AAAAAAAAAAAAAAAAAAAAAAA");
   nnstreamer_decoder_probe (&directVideo);
 }
 
