@@ -35,7 +35,7 @@
 #include "nnstreamer_conf.h"
 #include <nnstreamer_log.h>
 
-REGISTER_FILTER(filter_custom);
+//REGISTER_FILTER(filter_custom);
 
 static const gchar *custom_accl_support[] = {
   ACCL_AUTO_STR,

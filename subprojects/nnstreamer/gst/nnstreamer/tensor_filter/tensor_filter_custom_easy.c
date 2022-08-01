@@ -30,7 +30,7 @@
 #include <nnstreamer_subplugin.h>
 #include <nnstreamer_util.h>
 
-REGISTER_FILTER(filter_custom_easy);
+//REGISTER_FILTER(filter_custom_easy);
 
 /**
  * @brief internal_data

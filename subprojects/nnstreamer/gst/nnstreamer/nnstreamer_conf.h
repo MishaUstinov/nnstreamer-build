@@ -45,15 +45,26 @@ G_BEGIN_DECLS
 
 /* Filter init/clear functions registration */
 #ifdef G_OS_WIN32
-#pragma section(".CRT$XCT", read)
+#include <Windows.h>
+
 #define REGISTER_FILTER(filter) \
-    void init_##filter(void); \
-    void fini_##filter(void); \
-    void filter##registrator(void) { \
+void init_##filter(void); \
+void fini_##filter(void); \
+extern BOOL APIENTRY DllMain(HMODULE hModule, \
+    DWORD  ul_reason_for_call, \
+    LPVOID lpReserved \
+) { \
+    switch (ul_reason_for_call) \
+    { \
+    case DLL_PROCESS_ATTACH: \
         init_##filter(); \
-        atexit(fini_##filter); \
+        break; \
+    case DLL_PROCESS_DETACH: \
+        fini_##filter(); \
+        break; \
     } \
-    __declspec(allocate(".CRT$XCT")) void(*filter##_registrator)(void) = filter##registrator;
+    return TRUE; \
+}
 #else
 #define REGISTER_FILTER(filter) \
     void init_##filter (void) __attribute__((constructor)); \

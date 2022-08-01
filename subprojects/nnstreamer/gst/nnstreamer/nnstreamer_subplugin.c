@@ -34,7 +34,41 @@
 /** @brief Array of dynamic loaded handles */
 static GPtrArray *handles = NULL;
 
-REGISTER_FILTER(subplugin);
+//REGISTER_FILTER(subplugin);
+
+#include <Windows.h>
+
+void init_subplugin(void);
+void init_filter_custom(void);
+void init_filter_custom_easy(void);
+void init_queryserver(void);
+void fini_subplugin(void);
+void fini_filter_custom(void);
+//void fini_filter_custom_easy(void);
+//void fini_queryserver(void);
+
+extern BOOL APIENTRY DllMain(HMODULE hModule,
+    DWORD  ul_reason_for_call,
+    LPVOID lpReserved
+) {
+    switch (ul_reason_for_call)
+    {
+    case DLL_PROCESS_ATTACH:
+        init_subplugin();
+        init_filter_custom();
+        init_filter_custom_easy();
+        //init_queryserver();
+        break;
+    case DLL_PROCESS_DETACH:
+        fini_subplugin();
+        fini_filter_custom();
+        fini_filter_custom_easy();
+        //fini_queryserver();
+        break;
+    }
+    return TRUE;
+}
+
 
 typedef struct
 {
